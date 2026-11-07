@@ -58,72 +58,68 @@ function update() {
         </div>
       </div>
 
-      {/* 4 Summarized Advantages of Pre-Compiling */}
+      {/* 4 Summarized Advantages of Pre-Compiling (Descriptions removed for clean presentation) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 my-1 flex-1 min-h-0 items-stretch font-mono">
         {/* Advantage 1 */}
-        <div className="p-3 md:p-3.5 rounded-xl bg-slate-950/85 border border-emerald-500/50 flex flex-col justify-between shadow-lg">
+        <div className="p-3 md:p-4 rounded-xl bg-slate-950/85 border border-emerald-500/50 flex flex-col justify-between shadow-lg">
           <div>
-            <div className="flex items-center justify-between text-xs font-bold text-emerald-400 mb-1">
+            <div className="flex items-center justify-between text-xs font-bold text-emerald-400 mb-1.5">
               <span>ADVANTAGE 01</span>
               <Zap className="w-4 h-4 text-emerald-400" />
             </div>
-            <h4 className="text-sm font-black text-white font-mono">Zero Virtual DOM</h4>
-            <p className="text-xs text-slate-300 mt-1 leading-snug font-sans">
-              No in-memory tree snapshots. The compiler outputs pinpoint vanilla JavaScript: <code>node.data = val</code>.
-            </p>
+            <h4 className="text-base md:text-lg font-black text-white font-mono leading-tight">
+              Zero Virtual DOM
+            </h4>
           </div>
-          <span className="text-[11px] text-emerald-300 font-bold block pt-1 border-t border-slate-800">
+          <span className="text-xs text-emerald-300 font-bold block pt-2 mt-2 border-t border-slate-800/80">
             ⚡ 2ms direct mutation
           </span>
         </div>
 
         {/* Advantage 2 */}
-        <div className="p-3 md:p-3.5 rounded-xl bg-slate-950/85 border border-cyan-500/50 flex flex-col justify-between shadow-lg">
+        <div className="p-3 md:p-4 rounded-xl bg-slate-950/85 border border-cyan-500/50 flex flex-col justify-between shadow-lg">
           <div>
-            <div className="flex items-center justify-between text-xs font-bold text-cyan-400 mb-1">
+            <div className="flex items-center justify-between text-xs font-bold text-cyan-400 mb-1.5">
               <span>ADVANTAGE 02</span>
               <Cpu className="w-4 h-4 text-cyan-400" />
             </div>
-            <h4 className="text-sm font-black text-white font-mono">Auto Dependencies</h4>
-            <p className="text-xs text-slate-300 mt-1 leading-snug font-sans">
-              Compiler statically resolves reactive graphs at build time (<code>$: double = count * 2</code>). Zero manual <code>[deps]</code>.
-            </p>
+            <h4 className="text-base md:text-lg font-black text-white font-mono leading-tight">
+              Auto Dependencies
+            </h4>
           </div>
-          <span className="text-[11px] text-cyan-300 font-bold block pt-1 border-t border-slate-800">
+          <span className="text-xs text-cyan-300 font-bold block pt-2 mt-2 border-t border-slate-800/80">
             ✓ Zero stale closures
           </span>
         </div>
 
         {/* Advantage 3 */}
-        <div className="p-3 md:p-3.5 rounded-xl bg-slate-950/85 border border-purple-500/50 flex flex-col justify-between shadow-lg">
+        <div className="p-3 md:p-4 rounded-xl bg-slate-950/85 border border-purple-500/50 flex flex-col justify-between shadow-lg">
           <div>
-            <div className="flex items-center justify-between text-xs font-bold text-purple-400 mb-1">
+            <div className="flex items-center justify-between text-xs font-bold text-purple-400 mb-1.5">
               <span>ADVANTAGE 03</span>
               <Box className="w-4 h-4 text-purple-400" />
             </div>
-            <h4 className="text-sm font-black text-white font-mono">Tiny Bundles</h4>
-            <p className="text-xs text-slate-300 mt-1 leading-snug font-sans">
-              The framework runtime evaporates. Instead of shipping a heavy diffing engine, you only ship tiny surgical DOM code.
-            </p>
+            <h4 className="text-base md:text-lg font-black text-white font-mono leading-tight">
+              Tiny Bundles
+            </h4>
           </div>
-          <span className="text-[11px] text-purple-300 font-bold block pt-1 border-t border-slate-800">
+          <span className="text-xs text-purple-300 font-bold block pt-2 mt-2 border-t border-slate-800/80">
             📦 Instant first paint
           </span>
         </div>
 
         {/* Advantage 4 */}
-        <div className="p-3 md:p-3.5 rounded-xl bg-slate-950/85 border border-rose-500/50 flex flex-col justify-between shadow-lg">
+        <div className="p-3 md:p-4 rounded-xl bg-slate-950/85 border border-rose-500/50 flex flex-col justify-between shadow-lg">
           <div>
-            <div className="flex items-center justify-between text-xs font-bold text-rose-400 mb-1">
+            <div className="flex items-center justify-between text-xs font-bold text-rose-400 mb-1.5">
               <span>ADVANTAGE 04</span>
               <Flame className="w-4 h-4 text-rose-400" />
             </div>
-            <h4 className="text-sm font-black text-white font-mono">Zero GC Freezes</h4>
-            <p className="text-xs text-slate-300 mt-1 leading-snug font-sans">
-              No continuous allocation of disposable tree nodes and synthetic event objects. Memory heap stays flat.
-            </p>
+            <h4 className="text-base md:text-lg font-black text-white font-mono leading-tight">
+              Zero GC Freezes
+            </h4>
           </div>
-          <span className="text-[11px] text-rose-300 font-bold block pt-1 border-t border-slate-800">
+          <span className="text-xs text-rose-300 font-bold block pt-2 mt-2 border-t border-slate-800/80">
             🛡️ Smooth 60fps scrolling
           </span>
         </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldAlert, Sparkles, Check, Copy, AlertTriangle, Layers, ArrowRight } from 'lucide-react';
+import { ShieldAlert, RefreshCw, Check, Copy, AlertTriangle, ArrowRight } from 'lucide-react';
 import { playSound } from '../../utils/audio';
 
 interface SlideProps {
@@ -9,27 +9,28 @@ interface SlideProps {
 export const Slide8HookTerror: React.FC<SlideProps> = ({ soundEnabled }) => {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  const promiseCode = `// The Promise: Clean Functional Components
-function UserProfile({ userId }) {
-  // State without classes or 'this' binding:
-  const [user, setUser] = useState(null);
+  const memoCode = `// 1. Fighting V-DOM Cascading Re-Renders
+function Dashboard({ items, query }) {
+  // useMemo: Caches expensive computation results
+  const sorted = useMemo(() => {
+    return heavySort(items, query);
+  }, [items, query]); // <-- Shallow Object.is check
 
-  useEffect(() => {
-    fetchUser(userId).then(setUser);
-  }, [userId]);
-
-  return <div>Hello, {user?.name}</div>;
+  // useCallback: Caches function instance identity
+  const onSelect = useCallback((id) => {
+    dispatch({ type: 'SELECT', id });
+  }, []); // Stable reference for memoized children
 }`;
 
-  const terrorCode = `// The Flaw: Linked List Sequential Order
-function BadComponent({ isLoggedIn }) {
-  if (isLoggedIn) {
-    // FATAL RUNTIME CRASH!
-    // Hook called conditionally:
-    const data = useUserData(); 
-    // Breaks linked list pointer alignment!
-  }
-  // Error: Rendered fewer hooks than expected.
+  const terrorCode = `// 2. The Strict Regime & Catch-22 Trap
+function FilterPanel({ filters, onSearch }) {
+  useEffect(() => {
+    fetchResults(filters);
+  }, []); // BUG: Stale closure! Reads initial 'filters' forever
+
+  // The Catch-22:
+  // Adding [filters] causes an INFINITE RE-RENDER LOOP
+  // unless parent also wraps 'filters' in useMemo!
 }`;
 
   const handleCopy = (code: string, id: string) => {
@@ -40,107 +41,107 @@ function BadComponent({ isLoggedIn }) {
   };
 
   return (
-    <div className="flex flex-col justify-between w-full h-full p-2 md:p-5 overflow-hidden text-left dir-ltr">
+    <div className="flex flex-col justify-between w-full h-full p-2.5 md:p-5 overflow-hidden text-left dir-ltr">
       {/* Title */}
       <div className="text-center mb-1 shrink-0">
         <span className="text-xs md:text-sm font-mono font-bold text-amber-400 uppercase tracking-widest block">
           Pillar 02 // Developer Experience Breakdown
         </span>
-        <h2 className="text-2xl md:text-4xl font-black text-white tracking-tight mt-0.5">
-          Understanding React Hooks: The Promise &amp; The &ldquo;Hook Terror&rdquo;
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight mt-0.5">
+          The &ldquo;Dependency Terror&rdquo;: useMemo, useCallback &amp; The Strict Regime
         </h2>
-        <p className="text-xs md:text-sm text-slate-300 font-mono mt-0.5">
-          Why storing hooks in a sequential linked list turned functional simplicity into a developer minefield
+        <p className="text-xs sm:text-sm md:text-base text-slate-300 font-mono mt-0.5">
+          How fighting Virtual DOM re-renders created a strict dependency prison—and sparked Svelte&apos;s rebellion
         </p>
       </div>
 
-      {/* 2-Column Balanced Grid: The Promise vs The Terror */}
+      {/* 2-Column Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 flex-1 min-h-0 my-1 items-stretch">
-        {/* Left Column: What Hooks Are (The Revolutionary Promise) */}
-        <div className="p-3.5 md:p-4 rounded-2xl bg-slate-950/90 border border-cyan-500/50 flex flex-col justify-between shadow-[0_0_20px_rgba(6,182,212,0.08)]">
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between border-b border-cyan-900/50 pb-1.5">
-              <h3 className="text-base md:text-lg font-black text-cyan-300 font-mono flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-cyan-400 shrink-0" />
-                <span>1. What Hooks Are: The Promise</span>
-              </h3>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 font-bold">
-                React 16.8 (2019)
-              </span>
-            </div>
-
-            <ul className="space-y-1 text-xs md:text-sm text-slate-300 font-sans">
-              <li className="flex items-start gap-1.5">
-                <span className="text-cyan-400 font-bold">•</span>
-                <span><strong className="text-white">Death of Class Components:</strong> Removed confusing <code>this</code> bindings and boilerplate lifecycle methods.</span>
-              </li>
-              <li className="flex items-start gap-1.5">
-                <span className="text-cyan-400 font-bold">•</span>
-                <span><strong className="text-white">Stateful Functions:</strong> <code>useState</code> &amp; <code>useEffect</code> allow functional components to own reactive state.</span>
-              </li>
-              <li className="flex items-start gap-1.5">
-                <span className="text-cyan-400 font-bold">•</span>
-                <span><strong className="text-white">Composable Logic:</strong> Replaced bloated HOC wrappers with custom hooks (e.g. <code>useAuth()</code>).</span>
-              </li>
-            </ul>
+        {/* Left Column: Minimizing Re-renders */}
+        <div className="p-3 md:p-3.5 rounded-2xl bg-slate-950/90 border border-cyan-500/50 flex flex-col justify-between shadow-xl">
+          {/* Header */}
+          <div className="flex items-center justify-between pb-1.5 border-b border-cyan-900/50 shrink-0">
+            <h3 className="text-sm md:text-base font-black text-cyan-300 font-mono flex items-center gap-1.5">
+              <RefreshCw className="w-4 h-4 text-cyan-400 shrink-0" />
+              <span>1. Minimizing Re-renders: useMemo &amp; useCallback</span>
+            </h3>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 font-bold">
+              Runtime Caching
+            </span>
           </div>
 
-          {/* Clean Code Snippet */}
-          <div className="relative mt-2 p-2.5 rounded-xl bg-slate-900/95 font-mono text-xs text-slate-300 border border-slate-800">
+          {/* Small Explanation Boxes Side by Side */}
+          <div className="grid grid-cols-2 gap-2 my-1.5 shrink-0 font-mono">
+            <div className="p-2 rounded-xl bg-slate-900/95 border border-slate-800">
+              <span className="text-[10px] text-cyan-400 uppercase font-bold block">The Re-render Tax</span>
+              <p className="text-[11px] md:text-xs text-slate-200 mt-0.5 font-medium leading-snug">
+                Every render reallocates all functions &amp; objects, triggering child diffing.
+              </p>
+            </div>
+            <div className="p-2 rounded-xl bg-slate-900/95 border border-slate-800">
+              <span className="text-[10px] text-cyan-400 uppercase font-bold block">What are [deps]?</span>
+              <p className="text-[11px] md:text-xs text-slate-200 mt-0.5 font-medium leading-snug">
+                <code>Object.is</code> equality array telling React when to recompute or reuse cache.
+              </p>
+            </div>
+          </div>
+
+          {/* Code Box: Reduced by 1-2 steps to text-xs sm:text-sm with leading-snug */}
+          <div className="relative flex-1 rounded-xl bg-slate-900/95 p-3 font-mono text-xs sm:text-sm leading-snug text-cyan-200 border border-slate-800 flex flex-col justify-center shadow-inner">
             <button
               type="button"
-              onClick={() => handleCopy(promiseCode, 'promise')}
-              className="absolute top-2 right-2 text-slate-400 hover:text-white transition flex items-center gap-1 text-[10px] cursor-pointer"
+              onClick={() => handleCopy(memoCode, 'memo')}
+              className="absolute top-2 right-2 text-slate-400 hover:text-white transition flex items-center gap-1 text-[10px] font-mono bg-slate-950 px-2 py-0.5 rounded border border-slate-800"
             >
-              {copiedCode === 'promise' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-              <span>{copiedCode === 'promise' ? 'Copied' : 'Copy'}</span>
+              {copiedCode === 'memo' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+              <span>{copiedCode === 'memo' ? 'Copied' : 'Copy'}</span>
             </button>
-            <pre className="overflow-x-auto leading-tight text-cyan-200/90 font-mono text-xs">
-              <code>{promiseCode}</code>
+            <pre className="overflow-x-auto">
+              <code>{memoCode}</code>
             </pre>
           </div>
         </div>
 
-        {/* Right Column: Why Strict Arrangement Causes Terror */}
-        <div className="p-3.5 md:p-4 rounded-2xl bg-slate-950/90 border border-rose-500/50 flex flex-col justify-between shadow-[0_0_20px_rgba(244,63,94,0.08)]">
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between border-b border-rose-900/50 pb-1.5">
-              <h3 className="text-base md:text-lg font-black text-rose-400 font-mono flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-rose-500 shrink-0" />
-                <span>2. The Linked List &amp; &ldquo;Hook Terror&rdquo;</span>
-              </h3>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 font-bold">
-                The Strict Prison
-              </span>
-            </div>
-
-            <ul className="space-y-1 text-xs md:text-sm text-slate-300 font-sans">
-              <li className="flex items-start gap-1.5">
-                <span className="text-rose-400 font-bold">•</span>
-                <span><strong className="text-white">Sequential Linked List:</strong> React identifies hooks by sequential invocation order, NOT by variable name.</span>
-              </li>
-              <li className="flex items-start gap-1.5">
-                <span className="text-rose-400 font-bold">•</span>
-                <span><strong className="text-white">Strict Rules of Hooks:</strong> Calling a hook in an <code>if</code> condition or loop breaks index pointers and crashes the app.</span>
-              </li>
-              <li className="flex items-start gap-1.5">
-                <span className="text-rose-400 font-bold">•</span>
-                <span><strong className="text-white">Dependency Array Fatigue:</strong> One missed item in <code>[deps]</code> triggers stale closures or infinite renders.</span>
-              </li>
-            </ul>
+        {/* Right Column: The Dependency Terror */}
+        <div className="p-3 md:p-3.5 rounded-2xl bg-slate-950/90 border border-rose-500/50 flex flex-col justify-between shadow-xl">
+          {/* Header */}
+          <div className="flex items-center justify-between pb-1.5 border-b border-rose-900/50 shrink-0">
+            <h3 className="text-sm md:text-base font-black text-rose-400 font-mono flex items-center gap-1.5">
+              <ShieldAlert className="w-4 h-4 text-rose-500 shrink-0" />
+              <span>2. The Strict Regime That Sparked Svelte</span>
+            </h3>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 font-bold">
+              The Catch-22
+            </span>
           </div>
 
-          {/* Clean Code Snippet */}
-          <div className="relative mt-2 p-2.5 rounded-xl bg-slate-900/95 font-mono text-xs text-slate-300 border border-slate-800">
+          {/* Small Explanation Boxes Side by Side */}
+          <div className="grid grid-cols-2 gap-2 my-1.5 shrink-0 font-mono">
+            <div className="p-2 rounded-xl bg-slate-900/95 border border-slate-800">
+              <span className="text-[10px] text-rose-400 uppercase font-bold block">The Catch-22 Trap</span>
+              <p className="text-[11px] md:text-xs text-slate-200 mt-0.5 font-medium leading-snug">
+                Miss a dep = stale closure bug. Include an object = infinite re-render loop.
+              </p>
+            </div>
+            <div className="p-2 rounded-xl bg-slate-900/95 border border-slate-800">
+              <span className="text-[10px] text-emerald-400 uppercase font-bold block">Svelte&apos;s Rebellion</span>
+              <p className="text-[11px] md:text-xs text-slate-200 mt-0.5 font-medium leading-snug">
+                Declared V-DOM bad practice: AOT compiler tracks reactive dependencies automatically.
+              </p>
+            </div>
+          </div>
+
+          {/* Code Box: Reduced by 1-2 steps to text-xs sm:text-sm with leading-snug */}
+          <div className="relative flex-1 rounded-xl bg-slate-900/95 p-3 font-mono text-xs sm:text-sm leading-snug text-rose-200 border border-slate-800 flex flex-col justify-center shadow-inner">
             <button
               type="button"
               onClick={() => handleCopy(terrorCode, 'terror')}
-              className="absolute top-2 right-2 text-slate-400 hover:text-white transition flex items-center gap-1 text-[10px] cursor-pointer"
+              className="absolute top-2 right-2 text-slate-400 hover:text-white transition flex items-center gap-1 text-[10px] font-mono bg-slate-950 px-2 py-0.5 rounded border border-slate-800"
             >
               {copiedCode === 'terror' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
               <span>{copiedCode === 'terror' ? 'Copied' : 'Copy'}</span>
             </button>
-            <pre className="overflow-x-auto leading-tight text-rose-200/90 font-mono text-xs">
+            <pre className="overflow-x-auto">
               <code>{terrorCode}</code>
             </pre>
           </div>
@@ -148,20 +149,17 @@ function BadComponent({ isLoggedIn }) {
       </div>
 
       {/* Bottom Key Takeaway */}
-      <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs md:text-sm text-slate-300 font-mono flex items-center justify-between shrink-0 mt-1">
+      <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs md:text-sm font-mono text-slate-300 flex items-center justify-between shrink-0 mt-1">
         <div className="flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
           <span>
-            <strong className="text-white">The Dilemma:</strong> To maintain the illusion of simple functions, React forced developers to police array dependencies manually.
+            <strong className="text-white">The Dilemma:</strong> React forced human engineers to manually police dependencies. Svelte proved compilers can do it for free.
           </span>
         </div>
         <span className="text-emerald-400 font-bold hidden sm:inline flex items-center gap-1 shrink-0">
-          Next: Svelte&apos;s Rebellion <ArrowRight className="w-3.5 h-3.5" />
+          Next: Svelte&apos;s Manifesto <ArrowRight className="w-3.5 h-3.5" />
         </span>
       </div>
     </div>
   );
 };
-
-
-

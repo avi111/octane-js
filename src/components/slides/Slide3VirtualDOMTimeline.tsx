@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Zap, RotateCcw, FastForward, CheckCircle2, AlertTriangle, Cpu, Layers } from 'lucide-react';
+import React, { useState } from 'react';
+import { Cpu, Layers, AlertTriangle, RefreshCw, Play, Zap } from 'lucide-react';
 import { playSound } from '../../utils/audio';
 
 interface Slide3Props {
@@ -7,290 +7,293 @@ interface Slide3Props {
   isActive: boolean;
 }
 
-export const Slide3VirtualDOMTimeline: React.FC<Slide3Props> = ({ soundEnabled, isActive }) => {
-  const [step, setStep] = useState<number>(1);
+export const Slide3VirtualDOMTimeline: React.FC<Slide3Props> = ({ soundEnabled }) => {
+  const [treeSize, setTreeSize] = useState<'medium' | 'large' | 'enterprise'>('medium');
+  const [isDiffing, setIsDiffing] = useState<boolean>(false);
 
-  const reactTimes = ["0 ms", "8 ms", "22 ms", "42 ms", "54 ms"];
-  const compilerTimes = ["0 ms", "2 ms", "2 ms", "2 ms", "2 ms"];
-
-  const handleNextStep = () => {
-    setStep((prev) => {
-      const next = prev >= 5 ? 1 : prev + 1;
-      playSound('step', soundEnabled);
-      return next;
-    });
+  const simulationData = {
+    medium: {
+      nodes: 1250,
+      allocations: "1,250 Objects",
+      comparisons: "1,250 Diffs",
+      gcGarbage: "185 KB Heap Churn",
+      domUpdates: "1 Text Node",
+      diffTime: "18 ms",
+      efficiency: "0.08%"
+    },
+    large: {
+      nodes: 5400,
+      allocations: "5,400 Objects",
+      comparisons: "5,400 Diffs",
+      gcGarbage: "820 KB Heap Churn",
+      domUpdates: "1 Text Node",
+      diffTime: "46 ms",
+      efficiency: "0.018%"
+    },
+    enterprise: {
+      nodes: 18000,
+      allocations: "18,000 Objects",
+      comparisons: "18,000 Diffs",
+      gcGarbage: "2.8 MB Heap Churn",
+      domUpdates: "1 Text Node",
+      diffTime: "112 ms (Frame Drop)",
+      efficiency: "0.005%"
+    }
   };
 
-  const handleReset = () => {
-    setStep(1);
-    playSound('click', soundEnabled);
+  const current = simulationData[treeSize];
+
+  const handleTriggerReconcile = () => {
+    setIsDiffing(true);
+    playSound('step', soundEnabled);
+    setTimeout(() => {
+      setIsDiffing(false);
+      playSound('success', soundEnabled);
+    }, 600);
   };
 
-  // Keyboard shortcut listener for spacebar specifically on this slide
-  useEffect(() => {
-    if (!isActive) return;
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return;
-      if (e.key === ' ' || e.code === 'Space') {
-        e.preventDefault();
-        handleNextStep();
-      }
-    };
-
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isActive, soundEnabled]);
-
-  const compilerStepActive = Math.min(step, 3);
+  const handleSelectSize = (size: 'medium' | 'large' | 'enterprise') => {
+    setTreeSize(size);
+    playSound('switch', soundEnabled);
+  };
 
   return (
-    <div className="flex flex-col justify-between w-full h-full p-2 md:p-5 overflow-hidden text-left dir-ltr">
-      {/* Header with Integrated Stepper & Spacebar Controls (Never covers cards) */}
-      <div className="shrink-0 flex flex-col md:flex-row md:items-center justify-between gap-2 pb-1 border-b border-slate-800/80 mb-1">
-        <div>
-          <span className="text-xs font-mono font-bold text-rose-400 uppercase tracking-widest block">
-            Pillar 02 // The Hidden Ceiling
-          </span>
-          <h2 className="text-2xl md:text-4xl font-black text-white tracking-tight">
-            The Hidden Ceiling of the Virtual DOM
-          </h2>
-          <p className="text-xs md:text-sm text-slate-300 font-mono">
-            54ms in-memory reconciliation vs. 2ms compiled direct DOM mutation
-          </p>
-        </div>
-
-        {/* Stepper Toolbar in Header */}
-        <div className="flex items-center gap-2 font-mono shrink-0">
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300">
-            <span className="text-slate-400">Press</span>
-            <span className="px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-700 text-cyan-300 font-black text-[11px]">
-              SPACE
-            </span>
-            <span className="text-slate-400">to step</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleReset}
-            title="Reset Stepper"
-            className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white transition cursor-pointer"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-          </button>
-
-          <button
-            type="button"
-            onClick={handleNextStep}
-            className="px-3 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-cyan-500/25 active:scale-95"
-          >
-            <FastForward className="w-3.5 h-3.5" />
-            <span>Step {step}/5</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content Area: React Track + Compiler Track + 3 Bottlenecks */}
-      <div className="flex-1 min-h-0 flex flex-col justify-around my-1 space-y-2">
-        {/* React Track (54ms) */}
-        <div className="p-3 md:p-3.5 rounded-xl border border-rose-500/50 bg-slate-950/90 shadow-[0_0_20px_rgba(244,63,94,0.08)]">
-          <div className="flex items-center justify-between mb-1.5">
-            <div>
-              <span className="text-sm md:text-base font-bold text-rose-400 font-mono">
-                React Virtual DOM (Runtime Reconciliation)
-              </span>
-              <p className="text-[11px] md:text-xs text-slate-400">
-                Component function re-execution, object tree allocation, recursive tree diffing
-              </p>
-            </div>
-            <div className="text-right">
-              <span className="text-[10px] text-slate-400 block font-mono uppercase font-semibold">
-                Latency
-              </span>
-              <span className="text-xl md:text-2xl font-black font-mono text-rose-400 tabular-nums">
-                {reactTimes[step - 1]}
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-5 gap-1.5 font-mono">
-            {/* Step 1 */}
-            <div
-              className={`p-2 rounded-lg border transition-all duration-200 ${
-                step >= 1
-                  ? 'border-rose-500 bg-rose-950/60 shadow-md scale-[1.02]'
-                  : 'border-slate-800 bg-slate-900/50 opacity-40'
-              }`}
-            >
-              <span className="text-xs font-bold text-white block">1. State Change</span>
-              <span className="text-[10px] text-slate-300 block truncate">setState()</span>
-              <span className="text-[10px] text-rose-300 font-bold block mt-1">+0 ms</span>
-            </div>
-
-            {/* Step 2 */}
-            <div
-              className={`p-2 rounded-lg border transition-all duration-200 ${
-                step >= 2
-                  ? 'border-rose-500 bg-rose-950/60 shadow-md scale-[1.02]'
-                  : 'border-slate-800 bg-slate-900/50 opacity-40'
-              }`}
-            >
-              <span className="text-xs font-bold text-white block">2. Re-render</span>
-              <span className="text-[10px] text-slate-300 block truncate">Run function</span>
-              <span className="text-[10px] text-rose-300 font-bold block mt-1">+8 ms</span>
-            </div>
-
-            {/* Step 3 */}
-            <div
-              className={`p-2 rounded-lg border transition-all duration-200 ${
-                step >= 3
-                  ? 'border-rose-500 bg-rose-950/60 shadow-md scale-[1.02]'
-                  : 'border-slate-800 bg-slate-900/50 opacity-40'
-              }`}
-            >
-              <span className="text-xs font-bold text-white block">3. Build Tree</span>
-              <span className="text-[10px] text-slate-300 block truncate">Allocate nodes</span>
-              <span className="text-[10px] text-rose-300 font-bold block mt-1">+22 ms</span>
-            </div>
-
-            {/* Step 4 */}
-            <div
-              className={`p-2 rounded-lg border transition-all duration-200 ${
-                step >= 4
-                  ? 'border-rose-500 bg-rose-950/60 shadow-md scale-[1.02]'
-                  : 'border-slate-800 bg-slate-900/50 opacity-40'
-              }`}
-            >
-              <span className="text-xs font-bold text-white block">4. Diffing</span>
-              <span className="text-[10px] text-slate-300 block truncate">O(t) compare</span>
-              <span className="text-[10px] text-rose-300 font-bold block mt-1">+42 ms</span>
-            </div>
-
-            {/* Step 5 */}
-            <div
-              className={`p-2 rounded-lg border transition-all duration-200 ${
-                step >= 5
-                  ? 'border-rose-500 bg-rose-950/60 shadow-md scale-[1.02]'
-                  : 'border-slate-800 bg-slate-900/50 opacity-40'
-              }`}
-            >
-              <span className="text-xs font-bold text-white block">5. Patch DOM</span>
-              <span className="text-[10px] text-slate-300 block truncate">Browser repaint</span>
-              <span className="text-[10px] text-rose-300 font-black block mt-1">54 ms Total</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Compiler Track (2ms) */}
-        <div className="p-3 md:p-3.5 rounded-xl border border-emerald-500/50 bg-slate-950/90 shadow-[0_0_20px_rgba(16,185,129,0.08)]">
-          <div className="flex items-center justify-between mb-1.5">
-            <div>
-              <span className="text-sm md:text-base font-bold text-emerald-400 font-mono">
-                Compiler-First Direct DOM (OctaneJS / TSRX / Svelte)
-              </span>
-              <p className="text-[11px] md:text-xs text-slate-400">
-                Zero intermediate Virtual DOM: Ahead-Of-Time compiler binds state directly to DOM pointers
-              </p>
-            </div>
-            <div className="text-right">
-              <span className="text-[10px] text-slate-400 block font-mono uppercase font-semibold">
-                Latency
-              </span>
-              <span className="text-xl md:text-2xl font-black font-mono text-emerald-400 tabular-nums">
-                {compilerTimes[step - 1]}
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 font-mono">
-            {/* Step 1 */}
-            <div
-              className={`p-2 rounded-lg border transition-all duration-200 ${
-                compilerStepActive >= 1
-                  ? 'border-emerald-500 bg-emerald-950/60 shadow-md scale-[1.02]'
-                  : 'border-slate-800 bg-slate-900/50 opacity-40'
-              }`}
-            >
-              <span className="text-xs font-bold text-white block">1. Signal Change</span>
-              <span className="text-[10px] text-slate-300 block truncate">Direct value mutation</span>
-              <span className="text-[10px] text-emerald-300 font-bold block mt-1">⚡ 0 ms</span>
-            </div>
-
-            {/* Step 2 */}
-            <div
-              className={`p-2 rounded-lg border transition-all duration-200 ${
-                compilerStepActive >= 2
-                  ? 'border-emerald-500 bg-emerald-950/60 shadow-md scale-[1.02]'
-                  : 'border-slate-800 bg-slate-900/50 opacity-40'
-              }`}
-            >
-              <span className="text-xs font-bold text-white block">2. Pinpoint Update</span>
-              <span className="text-[10px] text-slate-300 block truncate">O(1) compiled pointer update</span>
-              <span className="text-[10px] text-emerald-300 font-bold block mt-1">⚡ 2 ms</span>
-            </div>
-
-            {/* Step 3 */}
-            <div
-              className={`p-2 rounded-lg border transition-all duration-200 ${
-                compilerStepActive >= 3
-                  ? 'border-emerald-500 bg-emerald-950/60 shadow-md scale-[1.02]'
-                  : 'border-slate-800 bg-slate-900/50 opacity-40'
-              }`}
-            >
-              <span className="text-xs font-bold text-white flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span className="truncate">UI Rendered</span>
-              </span>
-              <span className="text-[10px] text-slate-300 block truncate">Instant paint</span>
-              <span className="text-[10px] text-emerald-300 font-black block mt-1">⚡ 2 ms (27x Faster)</span>
-            </div>
-          </div>
-        </div>
-
-        {/* 3 Major Bottleneck Cards (Clean, legible, zero overflow) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 font-mono">
-          <div className="p-3 rounded-xl bg-slate-900/90 border border-rose-900/60">
-            <div className="flex items-center gap-1.5 text-rose-400 font-bold text-xs md:text-sm mb-1">
-              <Cpu className="w-4 h-4 shrink-0" />
-              <span>Garbage Collection Freezes</span>
-            </div>
-            <p className="text-[11px] md:text-xs text-slate-300 leading-snug">
-              Creating thousands of temporary objects per keystroke triggers Stop-The-World browser GC pauses.
-            </p>
-          </div>
-
-          <div className="p-3 rounded-xl bg-slate-900/90 border border-amber-900/60">
-            <div className="flex items-center gap-1.5 text-amber-400 font-bold text-xs md:text-sm mb-1">
-              <Layers className="w-4 h-4 shrink-0" />
-              <span>O(t) Subtree Traversal</span>
-            </div>
-            <p className="text-[11px] md:text-xs text-slate-300 leading-snug">
-              Diffing cost scales with the size of the subtree (t) rather than the single value that changed.
-            </p>
-          </div>
-
-          <div className="p-3 rounded-xl bg-slate-900/90 border border-cyan-900/60">
-            <div className="flex items-center gap-1.5 text-cyan-300 font-bold text-xs md:text-sm mb-1">
-              <AlertTriangle className="w-4 h-4 shrink-0" />
-              <span>Synthetic Event Tax</span>
-            </div>
-            <p className="text-[11px] md:text-xs text-slate-300 leading-snug">
-              Wrapping native events in abstraction layers adds memory churn and input lag on rapid user events.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Summary Bar */}
-      <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 font-mono text-xs text-slate-300 flex items-center justify-between shrink-0 mt-1">
-        <span className="text-emerald-400 font-bold flex items-center gap-2">
-          <Zap className="w-4 h-4 text-emerald-400" />
-          <span>Verdict: At scale, in-memory tree reconciliation becomes the primary CPU &amp; GC bottleneck.</span>
+    <div className="flex flex-col justify-between w-full h-full p-2.5 md:p-5 overflow-hidden text-left dir-ltr">
+      {/* Header */}
+      <div className="shrink-0 mb-1.5 md:mb-2 pb-1.5 border-b border-slate-800/80">
+        <span className="text-xs font-mono font-bold text-rose-400 uppercase tracking-widest block">
+          Pillar 02 // The Hidden Ceiling
         </span>
-        <span className="text-slate-400 hidden sm:inline">Use SPACEBAR or Next button above</span>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight mt-0.5">
+          The Hidden Overhead of Runtime Reconciliation
+        </h2>
+        <p className="text-xs sm:text-sm text-slate-300 font-mono mt-0.5">
+          Why in-memory tree diffing becomes an architectural bottleneck as application scale grows
+        </p>
+      </div>
+
+      {/* 2-Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-4 flex-1 min-h-0 my-1 items-stretch">
+        {/* Left Column (5 Cols): The 3 Overhead Boxes (No Long Descriptions - Ultra Clean & No Overflow) */}
+        <div className="lg:col-span-5 flex flex-col justify-between gap-2.5 h-full">
+          {/* Overhead 1: Garbage Collection */}
+          <div className="p-3.5 md:p-4 rounded-2xl border border-rose-500/50 bg-slate-950/90 shadow-md flex-1 flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] md:text-xs font-mono uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-800">
+                OVERHEAD 01 • MEMORY HEAP
+              </span>
+              <div className="p-1.5 rounded-lg bg-slate-900 text-rose-400 border border-slate-800">
+                <Cpu className="w-4 h-4" />
+              </div>
+            </div>
+
+            <div className="my-auto py-1.5">
+              <h3 className="text-lg md:text-xl font-black text-white leading-tight font-mono">
+                Garbage Collection Freezes
+              </h3>
+              <p className="text-xs font-mono text-rose-300 mt-1 font-semibold">
+                Thousands of ephemeral tree nodes force Stop-The-World browser GC pauses.
+              </p>
+            </div>
+
+            <div className="pt-2 border-t border-slate-800/80 text-[11px] font-mono text-rose-400 flex items-center gap-1.5">
+              <span>⚠️ Drops frames below 60fps on keystrokes</span>
+            </div>
+          </div>
+
+          {/* Overhead 2: O(t) Subtree Traversal */}
+          <div className="p-3.5 md:p-4 rounded-2xl border border-amber-500/50 bg-slate-950/90 shadow-md flex-1 flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] md:text-xs font-mono uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800">
+                OVERHEAD 02 • ALGORITHMIC LIMIT
+              </span>
+              <div className="p-1.5 rounded-lg bg-slate-900 text-amber-400 border border-slate-800">
+                <Layers className="w-4 h-4" />
+              </div>
+            </div>
+
+            <div className="my-auto py-1.5">
+              <h3 className="text-lg md:text-xl font-black text-white leading-tight font-mono">
+                O(t) Subtree Traversal
+              </h3>
+              <p className="text-xs font-mono text-amber-300 mt-1 font-semibold">
+                Cost scales with total subtree size (t), not with the 1 changed value.
+              </p>
+            </div>
+
+            <div className="pt-2 border-t border-slate-800/80 text-[11px] font-mono text-amber-400 flex items-center gap-1.5">
+              <span>⚠️ Updating 1 badge diffs thousands of sibling nodes</span>
+            </div>
+          </div>
+
+          {/* Overhead 3: Synthetic Event & Wrapper Tax */}
+          <div className="p-3.5 md:p-4 rounded-2xl border border-cyan-500/50 bg-slate-950/90 shadow-md flex-1 flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] md:text-xs font-mono uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800">
+                OVERHEAD 03 • WRAPPER TAX
+              </span>
+              <div className="p-1.5 rounded-lg bg-slate-900 text-cyan-400 border border-slate-800">
+                <AlertTriangle className="w-4 h-4" />
+              </div>
+            </div>
+
+            <div className="my-auto py-1.5">
+              <h3 className="text-lg md:text-xl font-black text-white leading-tight font-mono">
+                Synthetic Event Wrapper Tax
+              </h3>
+              <p className="text-xs font-mono text-cyan-300 mt-1 font-semibold">
+                Wrapping native events creates allocation churn on every mouse move and scroll.
+              </p>
+            </div>
+
+            <div className="pt-2 border-t border-slate-800/80 text-[11px] font-mono text-cyan-300 flex items-center gap-1.5">
+              <span>⚠️ Noticeable input latency on data-dense tables</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column (7 Cols): Live Demonstration (Streamlined & Non-Overflowing) */}
+        <div className="lg:col-span-7 rounded-2xl border border-purple-500/50 bg-slate-950/95 p-3.5 md:p-4 flex flex-col justify-between shadow-2xl relative overflow-hidden">
+          {/* Header of Demonstration */}
+          <div className="flex items-center justify-between pb-2 border-b border-slate-800 gap-2 shrink-0">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold text-purple-400 uppercase tracking-widest">
+                Reconciliation Simulator
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800 font-bold hidden sm:inline">
+                Diffing Tax
+              </span>
+            </div>
+
+            {/* Scale Selector */}
+            <div className="flex items-center gap-1 font-mono text-xs shrink-0">
+              <button
+                type="button"
+                onClick={() => handleSelectSize('medium')}
+                className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition text-[11px] ${
+                  treeSize === 'medium' ? 'bg-cyan-500 text-slate-950' : 'bg-slate-900 text-slate-400 hover:text-white'
+                }`}
+              >
+                1.2k Nodes
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSelectSize('large')}
+                className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition text-[11px] ${
+                  treeSize === 'large' ? 'bg-amber-500 text-slate-950' : 'bg-slate-900 text-slate-400 hover:text-white'
+                }`}
+              >
+                5.4k Nodes
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSelectSize('enterprise')}
+                className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition text-[11px] ${
+                  treeSize === 'enterprise' ? 'bg-rose-500 text-white' : 'bg-slate-900 text-slate-400 hover:text-white'
+                }`}
+              >
+                18k Nodes
+              </button>
+            </div>
+          </div>
+
+          {/* Trigger Bar */}
+          <div className="my-1.5 p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between gap-2 shrink-0 font-mono text-xs">
+            <span className="text-slate-300 truncate">
+              Trigger: <strong className="text-white">1 value change</strong> (<code>count++</code>)
+            </span>
+
+            <button
+              type="button"
+              onClick={handleTriggerReconcile}
+              disabled={isDiffing}
+              className={`px-3 py-1.5 rounded-lg font-mono text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow ${
+                isDiffing
+                  ? 'bg-amber-500 text-slate-950 animate-pulse'
+                  : 'bg-purple-600 hover:bg-purple-500 text-white shadow-purple-600/30 active:scale-95'
+              }`}
+            >
+              {isDiffing ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3 fill-current" />}
+              <span>{isDiffing ? 'Diffing Subtree...' : 'Simulate 1 State Update'}</span>
+            </button>
+          </div>
+
+          {/* 4 Metric Badges */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 my-1 shrink-0 font-mono">
+            <div className={`p-2.5 rounded-xl border transition-all ${isDiffing ? 'border-rose-400 bg-rose-950/50 scale-[1.02]' : 'border-slate-800 bg-slate-900/60'}`}>
+              <span className="text-[10px] text-slate-400 block uppercase font-bold">Allocated</span>
+              <span className="text-sm md:text-base font-black text-rose-400 block mt-0.5">{current.allocations}</span>
+            </div>
+
+            <div className={`p-2.5 rounded-xl border transition-all ${isDiffing ? 'border-amber-400 bg-amber-950/50 scale-[1.02]' : 'border-slate-800 bg-slate-900/60'}`}>
+              <span className="text-[10px] text-slate-400 block uppercase font-bold">Diff Checks</span>
+              <span className="text-sm md:text-base font-black text-amber-400 block mt-0.5">{current.comparisons}</span>
+            </div>
+
+            <div className={`p-2.5 rounded-xl border transition-all ${isDiffing ? 'border-purple-400 bg-purple-950/50 scale-[1.02]' : 'border-slate-800 bg-slate-900/60'}`}>
+              <span className="text-[10px] text-slate-400 block uppercase font-bold">GC Garbage</span>
+              <span className="text-sm md:text-base font-black text-purple-300 block mt-0.5">{current.gcGarbage}</span>
+            </div>
+
+            <div className="p-2.5 rounded-xl border border-emerald-500/50 bg-emerald-950/40">
+              <span className="text-[10px] text-emerald-400 block uppercase font-bold">Actual Work</span>
+              <span className="text-sm md:text-base font-black text-emerald-300 block mt-0.5">{current.domUpdates}</span>
+            </div>
+          </div>
+
+          {/* Visual Mini Subtree Scan Graphic */}
+          <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 my-1 flex-1 flex flex-col justify-between">
+            <div className="flex items-center justify-between text-xs font-mono pb-1.5 border-b border-slate-800/80">
+              <span className="text-slate-400 font-semibold text-[11px]">Subtree Traversal Map</span>
+              <div className="flex items-center gap-2 text-[10px]">
+                <span className="text-rose-400 font-bold">99.9% Redundant Diffing</span>
+                <span className="text-emerald-400 font-bold">• 1 Real Target</span>
+              </div>
+            </div>
+
+            {/* Compact Graphic Representation of Nodes */}
+            <div className="my-auto py-2">
+              <div className="flex items-center justify-center gap-1.5 flex-wrap max-w-md mx-auto">
+                {Array.from({ length: 28 }).map((_, i) => {
+                  const isTarget = i === 17;
+                  return (
+                    <div
+                      key={i}
+                      className={`h-4 rounded transition-all duration-300 flex items-center justify-center text-[8px] font-mono font-bold ${
+                        isTarget
+                          ? 'w-9 bg-emerald-500 text-slate-950 ring-2 ring-emerald-300 scale-110 shadow-md'
+                          : isDiffing
+                          ? 'w-6 bg-rose-500/70 text-rose-100 border border-rose-400 animate-pulse'
+                          : 'w-6 bg-slate-800 text-slate-400 border border-slate-700'
+                      }`}
+                    >
+                      {isTarget ? 'TARGET' : `n${i + 1}`}
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-center font-mono text-[10px] text-slate-400 mt-1.5">
+                {isDiffing ? (
+                  <span className="text-amber-400 font-bold">⚠️ Scanning 28 nodes in memory to update 1 leaf node...</span>
+                ) : (
+                  <span>Re-evaluates every branch just to mutate the single green target.</span>
+                )}
+              </p>
+            </div>
+
+            {/* Benchmark Footer inside Demonstration */}
+            <div className="p-2 rounded-lg bg-slate-950 border border-slate-800 font-mono text-[11px] flex items-center justify-between shrink-0">
+              <span className="text-rose-400 font-semibold">
+                React Diff Latency: <strong>{current.diffTime}</strong>
+              </span>
+              <span className="text-emerald-400 font-bold flex items-center gap-1">
+                <Zap className="w-3 h-3" />
+                Direct DOM: <strong>0.1 ms (No Diffing)</strong>
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
-
-

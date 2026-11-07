@@ -54,8 +54,8 @@ export const Slide2Roadmap: React.FC<Slide2RoadmapProps> = ({ soundEnabled, onJu
       textColor: "text-purple-400",
       btnBg: "bg-purple-500 hover:bg-purple-400 text-slate-950",
       icon: Zap,
-      targetSlide: 8,
-      targetSlideText: "Slide 8"
+      targetSlide: 9,
+      targetSlideText: "Slide 9"
     },
     {
       id: 4,
@@ -70,8 +70,8 @@ export const Slide2Roadmap: React.FC<Slide2RoadmapProps> = ({ soundEnabled, onJu
       textColor: "text-emerald-400",
       btnBg: "bg-emerald-500 hover:bg-emerald-400 text-slate-950",
       icon: Flag,
-      targetSlide: 11,
-      targetSlideText: "Slide 11"
+      targetSlide: 12,
+      targetSlideText: "Slide 12"
     }
   ];
 

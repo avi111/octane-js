@@ -13,7 +13,8 @@ import { Slide3MiddleManager } from './components/slides/Slide3MiddleManager';
 import { Slide2ClassicMVC } from './components/slides/Slide2ClassicMVC';
 import { Slide5VirtualDOMAdvantages } from './components/slides/Slide5VirtualDOMAdvantages';
 import { Slide3VirtualDOMTimeline } from './components/slides/Slide3VirtualDOMTimeline';
-import { Slide8HookTerror } from './components/slides/Slide8HookTerror';
+import { Slide7MemoCallback } from './components/slides/Slide7MemoCallback';
+import { Slide8DependencyTerror } from './components/slides/Slide8DependencyTerror';
 import { Slide7SveltePrecompile } from './components/slides/Slide7SveltePrecompile';
 import { Slide10TSRXInnovations } from './components/slides/Slide10TSRXInnovations';
 import { Slide11OctaneComplexity } from './components/slides/Slide11OctaneComplexity';
@@ -93,11 +94,8 @@ export default function App() {
         e.preventDefault();
         prevSlide();
       } else if (e.key === ' ' || e.code === 'Space') {
-        // Slide 6 is the VDOM Timeline stepping slide which has its own spacebar handler
-        if (currentSlide !== 6) {
-          e.preventDefault();
-          nextSlide();
-        }
+        e.preventDefault();
+        nextSlide();
       } else if (e.key === 'f' || e.key === 'F') {
         e.preventDefault();
         toggleFullscreen();
@@ -182,42 +180,48 @@ export default function App() {
         );
       case 7:
         return (
-          <Slide8HookTerror
+          <Slide7MemoCallback
             soundEnabled={soundEnabled}
           />
         );
       case 8:
         return (
-          <Slide7SveltePrecompile
+          <Slide8DependencyTerror
             soundEnabled={soundEnabled}
           />
         );
       case 9:
         return (
-          <Slide10TSRXInnovations
+          <Slide7SveltePrecompile
             soundEnabled={soundEnabled}
           />
         );
       case 10:
         return (
-          <Slide11OctaneComplexity
+          <Slide10TSRXInnovations
             soundEnabled={soundEnabled}
           />
         );
       case 11:
         return (
-          <Slide12ComparisonTable
+          <Slide11OctaneComplexity
             soundEnabled={soundEnabled}
           />
         );
       case 12:
+        return (
+          <Slide12ComparisonTable
+            soundEnabled={soundEnabled}
+          />
+        );
+      case 13:
         return (
           <Slide17Summary
             soundEnabled={soundEnabled}
             onJumpToSlide={goToSlide}
           />
         );
-      case 13:
+      case 14:
         return (
           <Slide18TheEnd
             soundEnabled={soundEnabled}

@@ -84,18 +84,32 @@ export const SLIDES_DATA: SlideMeta[] = [
   },
   {
     id: 7,
-    title: "Understanding React Hooks: The Promise & The 'Hook Terror'",
-    subtitle: "From functional purity to the linked-list prison of Rules of Hooks and useMemo dependency fatigue",
+    title: "Minimizing Re-Renders: useMemo & useCallback",
+    subtitle: "Why top-down function re-execution forced React into manual reference caching",
     phase: "Pillar 02 // Developer Experience Breakdown",
-    tags: ["React Hooks", "Rules of Hooks", "Linked List", "useMemo", "Hook Terror"],
+    tags: ["useMemo", "useCallback", "Re-renders", "Dependencies", "Object.is"],
     notes: [
-      "The Promise: React 16.8 introduced Hooks to replace verbose classes with pure functional components.",
-      "The Flaw: React stores hooks in a sequential linked list and relies on strict call order across renders.",
-      "The Terror: No hooks in conditions or loops. Miss one useMemo dependency and get stale closures or infinite render loops."
+      "The Re-render Tax: Whenever state updates, React re-runs the component function from top to bottom.",
+      "Every inline object, array, and callback is reallocated with a fresh memory reference.",
+      "Child components wrapped in React.memo see new references on every render, destroying memoization.",
+      "React introduced useMemo (caching values) and useCallback (caching function identity) via [deps] shallow equality check."
     ]
   },
   {
     id: 8,
+    title: "The 'Dependency Terror': The Authoritarian Strict Regime",
+    subtitle: "Stale closures, infinite loops, and the breaking point that sparked Svelte",
+    phase: "Pillar 02 // The Breaking Point",
+    tags: ["Dependency Terror", "Exhaustive-Deps", "Stale Closures", "Infinite Loops", "Svelte"],
+    notes: [
+      "The Authoritarian Linters: react-hooks/exhaustive-deps strictly forces every variable into [deps].",
+      "The Catch-22 Trap: Miss a dependency = stale closure reading outdated state. Add an object = infinite re-render loop.",
+      "Developers spent 40% of their time fighting linters, writing useRef trampolines, and defensive memoization.",
+      "This directly sparked Svelte: Rich Harris declared the Virtual DOM pure overhead, proving compilers can track dependencies automatically."
+    ]
+  },
+  {
+    id: 9,
     title: "Svelte's Rebellion: 'Virtual DOM Is Bad — Pre-Compile Instead'",
     subtitle: "Rich Harris' manifesto: Eliminating the middle manager through Ahead-of-Time compilation",
     phase: "Pillar 03 // The Compiler Rebellion",
@@ -109,7 +123,7 @@ export const SLIDES_DATA: SlideMeta[] = [
     ]
   },
   {
-    id: 9,
+    id: 10,
     title: "Dominic Gannaway & TSRX Innovations",
     subtitle: "Bringing compiler statements (@if, @for), hoisted hooks, and scoped CSS into TypeScript JSX",
     phase: "Pillar 03 // The Architect",
@@ -122,7 +136,7 @@ export const SLIDES_DATA: SlideMeta[] = [
     ]
   },
   {
-    id: 10,
+    id: 11,
     title: "OctaneJS: From O(t) Tree Traversal to O(1) Direct Mutation",
     subtitle: "Eliminating the diff: Template cloning, pinpoint dynamic pointers, and zero async waterfalls",
     phase: "Pillar 03 // Algorithmic Shift",
@@ -134,7 +148,7 @@ export const SLIDES_DATA: SlideMeta[] = [
     ]
   },
   {
-    id: 11,
+    id: 12,
     title: "Architecture Comparison & Incremental Adoption",
     subtitle: "Zero all-or-nothing risk: Accelerating existing React codebases with OctaneCompat",
     phase: "Pillar 04 // Practical Adoption",
@@ -146,7 +160,7 @@ export const SLIDES_DATA: SlideMeta[] = [
     ]
   },
   {
-    id: 12,
+    id: 13,
     title: "The Reactive Architecture Evolution Summary",
     subtitle: "The future combines the familiarity of React, the clean syntax of TSRX, and the O(1) speed of OctaneJS",
     phase: "Keynote Synthesis",
@@ -157,7 +171,7 @@ export const SLIDES_DATA: SlideMeta[] = [
     ]
   },
   {
-    id: 13,
+    id: 14,
     title: "The End ~ Fin ~",
     subtitle: "Classic vintage cinema title card • Presented by Avi Levkovich",
     phase: "Conclusion",
