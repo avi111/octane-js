@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, Info, Sparkles, AlertCircle, Zap, Layers, Monitor, Maximize2 } from 'lucide-react';
+import { Eye, Sparkles, ArrowRight, Zap, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { playSound } from '../../utils/audio';
 
 interface Slide3MiddleManagerProps {
@@ -11,128 +11,185 @@ export const Slide3MiddleManager: React.FC<Slide3MiddleManagerProps> = ({ soundE
 
   const zones = [
     {
-      id: 'all' as const,
-      label: 'Full Metaphor Overview',
-      enLabel: 'End-to-End Pipeline',
-      desc: 'The complete journey: From rapid application data dispatches, through the stressed Virtual DOM middle manager, to the blocked user screen.'
-    },
-    {
       id: 'left' as const,
-      label: '1. Application Workflow',
-      enLabel: 'Incoming Data Updates',
-      desc: 'Rapid state dispatches, continuous keystrokes, WebSocket events, and synthetic wrappers flooding the manager’s desk in real time.'
+      zoneName: 'left',
+      phaseNum: '01',
+      tag: 'APPLICATION WORKFLOW',
+      title: 'Incoming Data Flood',
+      desc: 'Rapid state dispatches, continuous keystrokes, and synthetic event objects flooding the manager’s desk.',
+      accent: 'cyan',
+      borderClass: 'border-cyan-500/50',
+      activeClass: 'border-cyan-400 bg-cyan-950/70 shadow-[0_0_25px_rgba(6,182,212,0.3)] ring-1 ring-cyan-400',
+      tagClass: 'bg-cyan-950 text-cyan-300 border-cyan-800'
     },
     {
       id: 'center' as const,
-      label: '2. Middle Manager: Virtual DOM',
-      enLabel: 'Reconciliation Bottleneck',
-      desc: 'Buried in stacks of paperwork (object tree allocations, deep diffing passes, Garbage Collection stalls). "I used to bring order!"'
+      zoneName: 'center',
+      phaseNum: '02',
+      tag: 'MIDDLE MANAGER (V-DOM)',
+      title: 'The Paperwork Bottleneck',
+      desc: 'Buried in stacks of paperwork: tree re-creation, recursive diffing passes, and Garbage Collection pauses.',
+      accent: 'rose',
+      borderClass: 'border-rose-500/50',
+      activeClass: 'border-rose-400 bg-rose-950/70 shadow-[0_0_25px_rgba(244,63,94,0.3)] ring-1 ring-rose-400',
+      tagClass: 'bg-rose-950 text-rose-300 border-rose-800'
     },
     {
       id: 'right' as const,
-      label: '3. User Screen & Direct Solution',
-      enLabel: "Direct-to-Screen Execution",
-      desc: 'The user waits on an hourglass spinner. The frustrated engineer demands: "Just let it go directly to the screen!" — the core principle of Svelte, TSRX, and OctaneJS.'
+      zoneName: 'right',
+      phaseNum: '03',
+      tag: 'THE USER’S SCREEN',
+      title: 'Direct O(1) DOM Solution',
+      desc: 'The user waits on an hourglass spinner. The modern engineer demands: "Just let data go directly to the screen!"',
+      accent: 'emerald',
+      borderClass: 'border-emerald-500/50',
+      activeClass: 'border-emerald-400 bg-emerald-950/70 shadow-[0_0_25px_rgba(16,185,129,0.3)] ring-1 ring-emerald-400',
+      tagClass: 'bg-emerald-950 text-emerald-300 border-emerald-800'
     }
   ];
 
   const handleZoneClick = (zoneId: 'all' | 'left' | 'center' | 'right') => {
-    setActiveZone(zoneId);
+    setActiveZone((prev) => (prev === zoneId ? 'all' : zoneId));
     playSound('switch', soundEnabled);
   };
 
   return (
-    <div className="flex flex-col justify-between w-full h-full p-2 md:p-4 overflow-hidden text-left dir-ltr">
-      {/* Title */}
-      <div className="text-center mb-2 shrink-0">
-        <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[11px] font-mono text-cyan-300 mb-1">
-          <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+    <div className="flex flex-col justify-between w-full h-full p-2 md:p-6 overflow-hidden text-left dir-ltr">
+      {/* Title & Subtitle */}
+      <div className="text-center mb-1 shrink-0">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs md:text-sm font-mono text-cyan-300 mb-1">
+          <Sparkles className="w-4 h-4 text-cyan-400" />
           <span>Visual Architectural Metaphor</span>
         </div>
-        <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+        <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
           The Virtual DOM as an Overloaded Middle Manager
         </h2>
-        <p className="text-xs md:text-sm text-slate-400 font-mono mt-0.5">
-          Why tree diffing became the bureaucratic bottleneck between application state and the user&apos;s screen
+        <p className="text-sm md:text-base text-slate-300 font-mono mt-0.5">
+          In 2013, the V-DOM brought order. In 2026, it is buried in redundant paperwork.
         </p>
       </div>
 
-      {/* Main Image Showcase & Zone Selector */}
-      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch my-1">
-        {/* Left 8 Cols: Framed Image */}
-        <div className="lg:col-span-8 rounded-2xl border border-slate-800 bg-slate-950/80 p-2.5 flex flex-col justify-between relative overflow-hidden group shadow-2xl">
-          <div className="relative flex-1 w-full h-full min-h-[220px] rounded-xl overflow-hidden bg-slate-900/60 flex items-center justify-center border border-slate-800/80">
-            <img
-              src="/assets/aistudio/Gemini_Generated_Image_wqfkn6wqfkn6wqfk_8dcc07ff.jpeg"
-              alt="Middle Manager Virtual DOM Cartoon Illustration"
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-contain max-h-[55vh] transition-transform duration-300 group-hover:scale-[1.01]"
-            />
+      {/* Main Hero Cartoon Image Container (Spans full width, fills room cleanly) */}
+      <div className="flex-1 min-h-0 w-full relative my-1.5 flex items-center justify-center">
+        <div className="relative w-full h-full rounded-2xl overflow-hidden border border-slate-700/80 bg-slate-950 shadow-2xl flex items-center justify-center group">
+          <img
+            src="/assets/aistudio/Gemini_Generated_Image_wqfkn6wqfkn6wqfk_8dcc07ff.jpeg"
+            alt="Middle Manager Virtual DOM Cartoon Illustration"
+            referrerPolicy="no-referrer"
+            className="w-full h-full object-contain max-h-[50vh] transition-transform duration-300"
+          />
 
-            {/* Zone Spotlight Overlays */}
-            {activeZone === 'left' && (
-              <div className="absolute inset-y-0 left-0 w-1/3 bg-cyan-500/10 border-r-2 border-cyan-400 pointer-events-none transition-all duration-300" />
-            )}
-            {activeZone === 'center' && (
-              <div className="absolute inset-y-0 left-1/3 w-1/3 bg-rose-500/10 border-x-2 border-rose-500 pointer-events-none transition-all duration-300" />
-            )}
-            {activeZone === 'right' && (
-              <div className="absolute inset-y-0 right-0 w-1/3 bg-emerald-500/10 border-l-2 border-emerald-400 pointer-events-none transition-all duration-300" />
-            )}
-          </div>
+          {/* Spotlight Overlays matching the 3 zones */}
+          {activeZone === 'left' && (
+            <div className="absolute inset-y-0 left-0 w-1/3 bg-cyan-500/15 border-r-2 border-cyan-400 pointer-events-none transition-all duration-300 flex items-start p-3">
+              <span className="px-2.5 py-1 rounded bg-cyan-950/90 border border-cyan-400 text-cyan-200 font-mono text-xs font-bold shadow-lg">
+                Focus: Incoming Workflow
+              </span>
+            </div>
+          )}
+          {activeZone === 'center' && (
+            <div className="absolute inset-y-0 left-1/3 w-1/3 bg-rose-500/15 border-x-2 border-rose-500 pointer-events-none transition-all duration-300 flex items-start justify-center p-3">
+              <span className="px-2.5 py-1 rounded bg-rose-950/90 border border-rose-400 text-rose-200 font-mono text-xs font-bold shadow-lg">
+                Focus: The V-DOM Desk
+              </span>
+            </div>
+          )}
+          {activeZone === 'right' && (
+            <div className="absolute inset-y-0 right-0 w-1/3 bg-emerald-500/15 border-l-2 border-emerald-400 pointer-events-none transition-all duration-300 flex items-start justify-end p-3">
+              <span className="px-2.5 py-1 rounded bg-emerald-950/90 border border-emerald-400 text-emerald-200 font-mono text-xs font-bold shadow-lg">
+                Focus: Direct to Screen
+              </span>
+            </div>
+          )}
 
-          <div className="flex items-center justify-between pt-2 text-[10px] font-mono text-slate-400 shrink-0">
-            <span>Illustration: The Middle Manager Virtual DOM</span>
-            <span className="text-slate-400 hidden sm:inline">&quot;Just let it go directly to the screen!&quot;</span>
-          </div>
-        </div>
-
-        {/* Right 4 Cols: Interactive Zone Callouts */}
-        <div className="lg:col-span-4 rounded-2xl border border-slate-800 bg-slate-950/80 p-3 flex flex-col justify-between">
-          <div className="border-b border-slate-800 pb-2 mb-2 shrink-0">
-            <span className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
-              <Eye className="w-3.5 h-3.5 text-cyan-400" /> Interactive Zone Inspection:
-            </span>
-            <p className="text-[10px] text-slate-400 mt-0.5">Click any zone to examine the architectural metaphor</p>
-          </div>
-
-          <div className="space-y-2 flex-1 overflow-y-auto pr-1">
-            {zones.map((z) => {
-              const isSelected = activeZone === z.id;
-              return (
-                <button
-                  key={z.id}
-                  type="button"
-                  onClick={() => handleZoneClick(z.id)}
-                  className={`w-full p-2.5 rounded-xl border text-left transition cursor-pointer flex flex-col justify-between ${
-                    isSelected
-                      ? 'border-cyan-400 bg-cyan-950/40 text-white shadow-lg'
-                      : 'border-slate-800/80 bg-slate-900/50 hover:bg-slate-900 text-slate-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-[11px] font-bold">
-                    <span>{z.label}</span>
-                    <span className="text-[9px] font-mono text-slate-400">{z.enLabel}</span>
-                  </div>
-                  <p className="text-[10px] text-slate-400 leading-relaxed mt-1">
-                    {z.desc}
-                  </p>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="mt-2 pt-2 border-t border-slate-800 text-[10px] font-mono text-cyan-300 bg-slate-900/80 p-2 rounded-lg shrink-0">
-            <span className="font-bold block text-white mb-0.5">Core Architectural Takeaway:</span>
-            In 2013, the Virtual DOM was hired to tame messy manual DOM updates. In 2026, it has become an overstaffed middle manager doing unnecessary paperwork.
+          {/* Quick zone switcher overlay at top-right */}
+          <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 bg-slate-950/80 backdrop-blur-md px-2 py-1 rounded-xl border border-slate-800 text-[11px] font-mono">
+            <span className="text-slate-400 hidden sm:inline">Highlight:</span>
+            <button
+              type="button"
+              onClick={() => handleZoneClick('all')}
+              className={`px-2 py-0.5 rounded cursor-pointer transition ${
+                activeZone === 'all' ? 'bg-cyan-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              onClick={() => handleZoneClick('left')}
+              className={`px-2 py-0.5 rounded cursor-pointer transition ${
+                activeZone === 'left' ? 'bg-cyan-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              1. Left
+            </button>
+            <button
+              type="button"
+              onClick={() => handleZoneClick('center')}
+              className={`px-2 py-0.5 rounded cursor-pointer transition ${
+                activeZone === 'center' ? 'bg-rose-500 text-white font-black' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              2. Center
+            </button>
+            <button
+              type="button"
+              onClick={() => handleZoneClick('right')}
+              className={`px-2 py-0.5 rounded cursor-pointer transition ${
+                activeZone === 'right' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              3. Right
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Footer Insight Banner */}
-      <div className="mt-1 p-2 rounded-xl bg-slate-900/90 border border-slate-800 text-center text-xs text-slate-300 font-mono shrink-0">
-        <span className="text-emerald-400 font-bold">The Paradigm Shift:</span> Modern framework engineers ask: Why maintain an in-memory middle manager when an Ahead-Of-Time compiler can wire reactive state directly to DOM nodes in O(1) time?
+      {/* 3 Non-Overlapping Stage Cards directly beneath the cartoon columns */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 shrink-0 mt-1">
+        {zones.map((z) => {
+          const isSelected = activeZone === z.id;
+          return (
+            <div
+              key={z.id}
+              onClick={() => handleZoneClick(z.id)}
+              className={`p-3 md:p-4 rounded-xl border transition-all duration-200 cursor-pointer flex flex-col justify-between ${
+                isSelected
+                  ? z.activeClass
+                  : 'border-slate-800 bg-slate-950/85 hover:border-slate-700 hover:bg-slate-900/90'
+              }`}
+            >
+              <div>
+                <div className="flex items-center justify-between text-xs font-mono font-bold mb-1">
+                  <span className={`px-2 py-0.5 rounded border ${z.tagClass} text-[10px]`}>
+                    STAGE {z.phaseNum}
+                  </span>
+                  <span className="text-slate-400 text-[11px] uppercase tracking-wider">{z.tag}</span>
+                </div>
+                <h3 className="text-sm md:text-base font-black text-white font-mono mt-1">
+                  {z.title}
+                </h3>
+                <p className="text-xs md:text-sm text-slate-300 leading-snug mt-1 font-sans">
+                  {z.desc}
+                </p>
+              </div>
+
+              <div className="pt-2 mt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-mono">
+                <span className={isSelected ? 'text-white font-bold' : 'text-slate-400'}>
+                  {isSelected ? '● Zone Active' : 'Click to spotlight zone'}
+                </span>
+                <span className="text-slate-500">→</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Concise Bottom Keynote Insight Banner */}
+      <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-center text-xs md:text-sm text-slate-300 font-mono shrink-0 mt-2">
+        <strong className="text-cyan-400">The Keynote Insight:</strong> In 2013, the Virtual DOM was hired to tame manual updates. In 2026, compiler-first architectures cut out the middle manager so state mutates the DOM directly in O(1) time.
       </div>
     </div>
   );
 };
+

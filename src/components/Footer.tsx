@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { SlideMeta } from '../types/presentation';
+import { KeynoteTimer } from './KeynoteTimer';
 
 interface FooterProps {
   currentSlide: number;
@@ -20,20 +21,25 @@ export const Footer: React.FC<FooterProps> = ({
   onSelectSlide,
 }) => {
   return (
-    <footer className="relative z-20 px-4 md:px-6 py-2.5 border-t border-slate-800/80 bg-slate-950/70 backdrop-blur-md flex items-center justify-between text-xs text-slate-400 font-mono shrink-0">
-      <div className="flex items-center space-x-2">
-        <span>
-          Slide <span className="text-white font-bold">{currentSlide}</span> of{' '}
-          <span className="text-slate-300">{totalSlides}</span>
-        </span>
-        <span className="text-slate-600 hidden sm:inline">•</span>
-        <span className="hidden sm:inline text-slate-500">
-          Arrow keys ← → or Spacebar
-        </span>
+    <footer className="relative z-20 px-3 md:px-6 py-2 border-t border-slate-800/80 bg-slate-950/70 backdrop-blur-md flex items-center justify-between text-xs text-slate-400 font-mono shrink-0">
+      {/* Left side: 10m Decreasing Countdown Timer & Slide count */}
+      <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+        <KeynoteTimer initialSeconds={600} />
+
+        <div className="flex items-center space-x-1.5 hidden sm:flex">
+          <span>
+            Slide <span className="text-white font-bold">{currentSlide}</span> of{' '}
+            <span className="text-slate-300">{totalSlides}</span>
+          </span>
+          <span className="text-slate-600 hidden lg:inline">•</span>
+          <span className="hidden lg:inline text-slate-500">
+            ← → or Space
+          </span>
+        </div>
       </div>
 
-      {/* Slide Dots / Pill Indicators */}
-      <div className="flex items-center space-x-1.5 overflow-x-auto max-w-[45vw] py-1 px-1">
+      {/* Center: Slide Dots / Indicators */}
+      <div className="flex items-center space-x-1.5 overflow-x-auto max-w-[40vw] py-1 px-1">
         {slides.map((s) => {
           const isActive = s.id === currentSlide;
           return (
@@ -52,8 +58,8 @@ export const Footer: React.FC<FooterProps> = ({
         })}
       </div>
 
-      {/* Prev / Next Buttons */}
-      <div className="flex items-center space-x-2">
+      {/* Right side: Prev / Next Buttons */}
+      <div className="flex items-center space-x-2 shrink-0">
         <button
           type="button"
           onClick={onPrev}

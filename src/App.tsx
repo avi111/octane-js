@@ -10,19 +10,12 @@ import { playSound } from './utils/audio';
 import { Slide1Cover } from './components/slides/Slide1Cover';
 import { Slide2Roadmap } from './components/slides/Slide2Roadmap';
 import { Slide3MiddleManager } from './components/slides/Slide3MiddleManager';
-import { Slide1StateManagement } from './components/slides/Slide1StateManagement';
 import { Slide2ClassicMVC } from './components/slides/Slide2ClassicMVC';
 import { Slide3VirtualDOMTimeline } from './components/slides/Slide3VirtualDOMTimeline';
-import { Slide4HiddenCostVDOM } from './components/slides/Slide4HiddenCostVDOM';
-import { Slide5Knockout } from './components/slides/Slide5Knockout';
-import { Slide6Angular } from './components/slides/Slide6Angular';
-import { Slide7ReactRevolution } from './components/slides/Slide7ReactRevolution';
 import { Slide8HookTerror } from './components/slides/Slide8HookTerror';
-import { Slide9DominicGannaway } from './components/slides/Slide9DominicGannaway';
 import { Slide10TSRXInnovations } from './components/slides/Slide10TSRXInnovations';
 import { Slide11OctaneComplexity } from './components/slides/Slide11OctaneComplexity';
 import { Slide12ComparisonTable } from './components/slides/Slide12ComparisonTable';
-import { Slide13MigrationStrategy } from './components/slides/Slide13MigrationStrategy';
 import { Slide17Summary } from './components/slides/Slide17Summary';
 import { Slide18TheEnd } from './components/slides/Slide18TheEnd';
 
@@ -98,8 +91,8 @@ export default function App() {
         e.preventDefault();
         prevSlide();
       } else if (e.key === ' ' || e.code === 'Space') {
-        // Slide 6 is the VDOM Timeline stepping slide which has its own spacebar handler
-        if (currentSlide !== 6) {
+        // Slide 5 is the VDOM Timeline stepping slide which has its own spacebar handler
+        if (currentSlide !== 5) {
           e.preventDefault();
           nextSlide();
         }
@@ -167,44 +160,50 @@ export default function App() {
           />
         );
       case 4:
-        return <Slide1StateManagement soundEnabled={soundEnabled} />;
+        return (
+          <Slide2ClassicMVC
+            soundEnabled={soundEnabled}
+          />
+        );
       case 5:
-        return <Slide2ClassicMVC soundEnabled={soundEnabled} />;
-      case 6:
         return (
           <Slide3VirtualDOMTimeline
             soundEnabled={soundEnabled}
-            isActive={currentSlide === 6}
+            isActive={currentSlide === 5}
+          />
+        );
+      case 6:
+        return (
+          <Slide8HookTerror
+            soundEnabled={soundEnabled}
           />
         );
       case 7:
-        return <Slide4HiddenCostVDOM soundEnabled={soundEnabled} />;
+        return (
+          <Slide10TSRXInnovations
+            soundEnabled={soundEnabled}
+          />
+        );
       case 8:
-        return <Slide5Knockout soundEnabled={soundEnabled} />;
+        return (
+          <Slide11OctaneComplexity
+            soundEnabled={soundEnabled}
+          />
+        );
       case 9:
-        return <Slide6Angular soundEnabled={soundEnabled} />;
+        return (
+          <Slide12ComparisonTable
+            soundEnabled={soundEnabled}
+          />
+        );
       case 10:
-        return <Slide7ReactRevolution soundEnabled={soundEnabled} />;
-      case 11:
-        return <Slide8HookTerror soundEnabled={soundEnabled} />;
-      case 12:
-        return <Slide9DominicGannaway soundEnabled={soundEnabled} />;
-      case 13:
-        return <Slide10TSRXInnovations soundEnabled={soundEnabled} />;
-      case 14:
-        return <Slide11OctaneComplexity soundEnabled={soundEnabled} />;
-      case 15:
-        return <Slide12ComparisonTable soundEnabled={soundEnabled} />;
-      case 16:
-        return <Slide13MigrationStrategy soundEnabled={soundEnabled} />;
-      case 17:
         return (
           <Slide17Summary
             soundEnabled={soundEnabled}
             onJumpToSlide={goToSlide}
           />
         );
-      case 18:
+      case 11:
         return (
           <Slide18TheEnd
             soundEnabled={soundEnabled}
