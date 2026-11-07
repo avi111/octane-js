@@ -23,6 +23,8 @@ import { Slide10TSRXInnovations } from './components/slides/Slide10TSRXInnovatio
 import { Slide11OctaneComplexity } from './components/slides/Slide11OctaneComplexity';
 import { Slide12ComparisonTable } from './components/slides/Slide12ComparisonTable';
 import { Slide13MigrationStrategy } from './components/slides/Slide13MigrationStrategy';
+import { Slide17Summary } from './components/slides/Slide17Summary';
+import { Slide18TheEnd } from './components/slides/Slide18TheEnd';
 
 export default function App() {
   const [currentSlide, setCurrentSlide] = useState<number>(1);
@@ -195,6 +197,21 @@ export default function App() {
         return <Slide12ComparisonTable soundEnabled={soundEnabled} />;
       case 16:
         return <Slide13MigrationStrategy soundEnabled={soundEnabled} />;
+      case 17:
+        return (
+          <Slide17Summary
+            soundEnabled={soundEnabled}
+            onJumpToSlide={goToSlide}
+          />
+        );
+      case 18:
+        return (
+          <Slide18TheEnd
+            soundEnabled={soundEnabled}
+            onRewind={() => goToSlide(1)}
+            onOpenOverview={() => setIsOverviewOpen(true)}
+          />
+        );
       default:
         return (
           <Slide1Cover

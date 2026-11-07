@@ -38,7 +38,7 @@ export const Slide1Cover: React.FC<Slide1CoverProps> = ({ soundEnabled, onStart,
 
         <div className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>16 Interactive Slides</span>
+          <span>18 Interactive Slides</span>
         </div>
       </div>
 

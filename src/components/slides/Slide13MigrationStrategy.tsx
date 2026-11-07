@@ -105,15 +105,9 @@ export const Slide13MigrationStrategy: React.FC<SlideProps> = ({ soundEnabled })
           </div>
         </div>
 
-        {/* Closing Grand Takeaway */}
-        <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-950/40 via-purple-950/40 to-slate-950 border border-slate-800 text-center font-mono text-xs text-slate-300 space-y-1">
-          <div className="flex items-center justify-center gap-2 text-cyan-400 font-bold">
-            <Flag className="w-4 h-4 text-cyan-400" />
-            <span>The Reactive Architecture Evolution Summary</span>
-          </div>
-          <p className="text-slate-400 text-xs">
-            The future of frontend combines the developer familiarity of React, the clean syntax of TSRX, and the raw O(1) performance of OctaneJS.
-          </p>
+        {/* Migration Best Practice Note */}
+        <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 text-center font-mono text-xs text-slate-400">
+          <span className="text-emerald-400 font-bold">Migration Strategy Rule:</span> Start by identifying your app&apos;s highest-frequency re-render component (e.g. live data tables, audio visualizers, canvas feeds) and migrate it in isolation with <code className="text-cyan-300">OctaneCompat</code>.
         </div>
       </div>
     </div>

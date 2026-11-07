@@ -205,5 +205,29 @@ export const SLIDES_DATA: SlideMeta[] = [
       "OctaneCompat lets developers isolate high-frequency performance bottlenecks (grids, live feeds) within existing React apps.",
       "ReactCompat allows an Octane app to host complex third-party React libraries (charts, 3D canvases), preserving full ecosystem leverage."
     ]
+  },
+  {
+    id: 17,
+    title: "The Reactive Architecture Evolution Summary",
+    subtitle: "Synthesizing the Keynote: From manual jQuery DOM to Ahead-of-Time direct mutation",
+    phase: "Keynote Synthesis",
+    tags: ["Summary", "Synthesis", "The Future", "O(1)", "TSRX", "OctaneJS"],
+    notes: [
+      "Review the grand synthesis of the keynote:",
+      "Highlight the core thesis: 'The future of frontend combines the developer familiarity of React, the clean syntax of TSRX, and the raw O(1) performance of OctaneJS.'",
+      "Reinforce the 4-era timeline: Manual DOM, Virtual DOM, Svelte's Rebellion, and the compiled fine-grained reactive era."
+    ]
+  },
+  {
+    id: 18,
+    title: "The End ~ Fin ~",
+    subtitle: "Classic vintage cinema title card • Presented by Avi Levkovich",
+    phase: "Conclusion",
+    tags: ["The End", "Vintage Cinema", "Credits", "Avi Levkovich", "Q&A"],
+    notes: [
+      "Vintage cinema closing title card.",
+      "Thank the audience for their time and attention.",
+      "Open the floor for questions, architecture discussions, and feedback."
+    ]
   }
 ];

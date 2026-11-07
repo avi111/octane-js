@@ -53,3 +53,29 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #334155;
 }
+
+/* Vintage Film Aesthetics */
+@keyframes vintage-flicker {
+  0% { opacity: 0.97; }
+  20% { opacity: 0.94; }
+  40% { opacity: 0.99; }
+  60% { opacity: 0.96; }
+  80% { opacity: 0.93; }
+  100% { opacity: 0.98; }
+}
+
+.vintage-film {
+  animation: vintage-flicker 0.22s infinite;
+}
+
+@keyframes film-scratch {
+  0%, 100% { transform: translateX(0); opacity: 0.15; }
+  25% { transform: translateX(65px); opacity: 0.45; }
+  50% { transform: translateX(-40px); opacity: 0.1; }
+  75% { transform: translateX(110px); opacity: 0.35; }
+}
+
+.scratch-line {
+  animation: film-scratch 0.35s steps(3) infinite;
+}
+
