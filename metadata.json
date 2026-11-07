@@ -1,0 +1,6 @@
+{
+  "name": "Reimagining React Without the Virtual DOM",
+  "description": "Reimagining React Without the Virtual DOM - Architecture keynote presentation by Avi Levkovich exploring the reactive frontend evolution from jQuery and Knockout to React, Svelte, TSRX, and OctaneJS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

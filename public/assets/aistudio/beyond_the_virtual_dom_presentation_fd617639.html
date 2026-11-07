@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beyond the Virtual DOM: The Reactive Architecture Evolution</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030712;
+            overflow: hidden;
+            user-select: none;
+        }
+        code, pre {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .slide {
+            display: none;
+            opacity: 0;
+            transform: scale(0.985);
+            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+        }
+        /* Custom Glowing & Pulse Animations */
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 0.35; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .glow-pulse {
+            animation: pulse-subtle 3s infinite ease-in-out;
+        }
+        @keyframes data-flow-right {
+            0% { stroke-dashoffset: 24; }
+            100% { stroke-dashoffset: 0; }
+        }
+        .flow-line {
+            stroke-dasharray: 6, 6;
+            animation: data-flow-right 1.2s linear infinite;
+        }
+        @keyframes hotspot-flash {
+            0%, 100% { opacity: 0.2; transform: scale(0.85); }
+            50% { opacity: 0.95; transform: scale(1.25); filter: drop-shadow(0 0 12px rgba(239,68,68,0.9)); }
+        }
+        .vdom-hotspot {
+            animation: hotspot-flash 1.8s infinite ease-in-out;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
+
+    <!-- Top Navigation Header -->
+    <header class="relative z-20 px-6 py-3 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-md flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                <i class="fa-solid fa-microchip text-slate-950 text-sm font-bold"></i>
+            </div>
+            <div>
+                <h1 class="text-sm font-bold tracking-tight text-white flex items-center gap-2">
+                    Beyond the Virtual DOM
+                    <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-cyan-950 border border-cyan-800 text-cyan-300">Architecture Deck</span>
+                </h1>
+                <p id="slide-title-bar" class="text-xs text-slate-400 font-mono">Slide 1 of 13: State Management Architecture</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <button onclick="openOverview()" title="View All Slides (O)" class="px-2.5 py-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-300 text-xs font-mono transition flex items-center gap-1.5">
+                <i class="fa-solid fa-grid-2 text-[11px]"></i>
+                <span class="hidden sm:inline">Overview</span>
+            </button>
+            <button onclick="toggleFullscreen()" title="Toggle Fullscreen (F)" class="p-1.5 w-8 h-8 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-300 text-xs transition flex items-center justify-center">
+                <i class="fa-solid fa-expand"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Viewport for Slides -->
+    <main class="relative flex-1 w-full h-full max-w-7xl mx-auto p-4 md:p-6 flex items-center justify-center overflow-hidden">
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE 1: STATE MANAGEMENT ARCHITECTURE (JQUERY VS TWO-WAY BINDING)        -->
+        <!-- ========================================================================= -->
+        <section class="slide active flex-col justify-between w-full h-full max-h-[86vh] p-4 md:p-6 overflow-hidden" data-slide="1">
+            <div class="text-center mb-3 shrink-0">
+                <h2 class="text-2xl md:text-3xl font-black text-white tracking-tight">
+                    State Management Architecture
+                </h2>
+                <p class="text-xs md:text-sm text-slate-400 font-mono mt-1">
+                    The paradigm shift from manual DOM manipulation to automatic synchronisation
+                </p>
+            </div>
+
+            <!-- 50 / 50 Columns -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 min-h-0 items-stretch">
+                <!-- Left: jQuery / Vanilla JS -->
+                <div class="rounded-2xl border border-rose-500/30 bg-slate-950/60 p-4 flex flex-col justify-between shadow-[0_0_25px_rgba(244,63,94,0.06)] relative overflow-hidden">
+                    <div class="flex items-center justify-between border-b border-rose-900/30 pb-2 shrink-0">
+                        <div>
+                            <h3 class="text-base font-bold text-rose-300 font-mono flex items-center gap-2">
+                                <i class="fa-brands fa-js text-rose-400"></i>
+                                jQuery / Vanilla JS
+                            </h3>
+                            <p class="text-[10px] uppercase font-mono tracking-wider text-rose-400/80">Manual &amp; Unpredictable</p>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800">Circa 2008</span>
+                    </div>
+
+                    <!-- Diagram Visual -->
+                    <div class="relative flex-1 min-h-[170px] flex items-center justify-center my-2">
+                        <!-- Connectors SVG -->
+                        <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 200" preserveAspectRatio="none">
+                            <line x1="80" y1="40" x2="320" y2="40" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.4" />
+                            <line x1="80" y1="160" x2="320" y2="160" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.4" />
+                            <line x1="80" y1="40" x2="80" y2="160" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.4" />
+                            <line x1="320" y1="40" x2="320" y2="160" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.4" />
+                            <line x1="80" y1="40" x2="320" y2="160" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.3" />
+                            <line x1="80" y1="160" x2="320" y2="40" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.3" />
+                        </svg>
+
+                        <!-- Nodes -->
+                        <div class="absolute top-2 left-4 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow">DOM Selectors</div>
+                        <div class="absolute top-2 right-4 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow">Event Listeners</div>
+                        <div class="absolute bottom-2 left-4 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow">UI Inputs</div>
+                        <div class="absolute bottom-2 right-4 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow">Memory State</div>
+                        <div class="absolute top-1/2 right-4 -translate-y-1/2 px-3 py-1 rounded bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-400">JS Objects</div>
+
+                        <!-- Warning Badges -->
+                        <div class="absolute top-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-rose-950/90 border border-rose-700 text-[9px] font-mono text-rose-300 font-bold flex items-center gap-1 shadow">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Sync Error
+                        </div>
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2.5 py-1 rounded-full bg-rose-950/90 border border-rose-600 text-[10px] font-mono text-rose-300 font-bold flex items-center gap-1 shadow-lg shadow-rose-950">
+                            <i class="fa-solid fa-bolt"></i> Broken Loop
+                        </div>
+                        <div class="absolute bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-rose-950/90 border border-rose-700 text-[9px] font-mono text-rose-300 font-bold flex items-center gap-1 shadow">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Data Drift
+                        </div>
+                    </div>
+
+                    <!-- Interactive Demonstration -->
+                    <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-800 shrink-0 font-mono text-xs">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-slate-400 text-[11px]">Interactive Desync Bug Simulation:</span>
+                            <button id="btn-trigger-drift" onclick="triggerDriftBug()" class="px-2 py-1 rounded bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/40 text-[10px] transition">
+                                Trigger Desync Bug
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-[11px]">
+                            <div class="p-2 rounded bg-slate-950 border border-slate-800">
+                                <span class="text-slate-500 block text-[9px]">DOM Value</span>
+                                <span id="val-dom" class="text-amber-400 font-bold text-sm">$100</span>
+                            </div>
+                            <div class="p-2 rounded bg-slate-950 border border-slate-800">
+                                <span class="text-slate-500 block text-[9px]">Memory State (JS Variable)</span>
+                                <span id="val-js" class="text-emerald-400 font-bold text-sm">$100</span>
+                            </div>
+                        </div>
+                        <div id="drift-alert" class="mt-2 text-[10px] text-rose-400 font-mono hidden items-center gap-1.5">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span>State drift detected! Manual DOM push failed: UI is now showing stale data.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Two-Way Binding -->
+                <div class="rounded-2xl border border-emerald-500/30 bg-slate-950/60 p-4 flex flex-col justify-between shadow-[0_0_25px_rgba(16,185,129,0.06)] relative overflow-hidden">
+                    <div class="flex items-center justify-between border-b border-emerald-900/30 pb-2 shrink-0">
+                        <div>
+                            <h3 class="text-base font-bold text-emerald-300 font-mono flex items-center gap-2">
+                                <i class="fa-solid fa-arrows-rotate text-emerald-400"></i>
+                                Two-Way Binding
+                            </h3>
+                            <p class="text-[10px] uppercase font-mono tracking-wider text-emerald-400/80">Automated &amp; Synchronised</p>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">Knockout / Angular</span>
+                    </div>
+
+                    <!-- Diagram Visual -->
+                    <div class="relative flex-1 min-h-[170px] flex items-center justify-center my-2">
+                        <!-- Curved Flow SVG -->
+                        <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 200" preserveAspectRatio="none">
+                            <path d="M 120 70 C 200 10, 200 10, 280 70" fill="none" stroke="#10b981" stroke-width="2" class="flow-line" />
+                            <path d="M 280 130 C 200 190, 200 190, 120 130" fill="none" stroke="#10b981" stroke-width="2" class="flow-line" />
+                        </svg>
+
+                        <!-- Nodes -->
+                        <div class="absolute left-6 w-36 h-20 rounded-xl bg-emerald-950/50 border-2 border-emerald-500/70 flex flex-col items-center justify-center text-center shadow-lg shadow-emerald-950/40">
+                            <span class="text-xs font-bold text-white font-mono">UI Inputs</span>
+                            <span class="text-[10px] text-emerald-400 font-mono">(View)</span>
+                        </div>
+
+                        <div class="absolute right-6 w-36 h-20 rounded-xl bg-emerald-950/50 border-2 border-emerald-500/70 flex flex-col items-center justify-center text-center shadow-lg shadow-emerald-950/40">
+                            <span class="text-xs font-bold text-white font-mono">Memory State</span>
+                            <span class="text-[10px] text-emerald-400 font-mono">(Model)</span>
+                        </div>
+
+                        <!-- Continuous Badges -->
+                        <div class="absolute top-4 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-600 text-[10px] font-mono text-emerald-300 font-bold flex items-center gap-1 shadow">
+                            <i class="fa-solid fa-lock"></i> Real-Time Sync
+                        </div>
+                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-600 text-[10px] font-mono text-emerald-300 font-bold flex items-center gap-1 shadow">
+                            <i class="fa-solid fa-lock"></i> Automatic Update
+                        </div>
+                    </div>
+
+                    <!-- Interactive Demonstration -->
+                    <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-800 shrink-0 font-mono text-xs">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-slate-400 text-[11px]">Live Continuous Reactive Loop:</span>
+                            <span class="text-[10px] text-emerald-400 font-mono">Auto-synced</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 items-center">
+                            <div>
+                                <label class="text-[9px] text-slate-500 block mb-1">Type in View Input:</label>
+                                <input type="text" id="two-way-input" value="Steve Sanderson" oninput="updateTwoWay(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono">
+                            </div>
+                            <div class="p-2 rounded bg-slate-950 border border-slate-800">
+                                <span class="text-[9px] text-slate-500 block">Synchronised Model:</span>
+                                <span id="two-way-output" class="text-emerald-400 font-bold text-xs truncate block">"Steve Sanderson"</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-[10px] text-emerald-400/90 font-mono flex items-center gap-1.5">
+                            <i class="fa-solid fa-bolt"></i>
+                            <span>Continuous Reactive Loop: Eliminates manual DOM pushing entirely.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Key Takeaway -->
+            <div class="mt-3 p-2 rounded-xl bg-slate-900/80 border border-slate-800 text-center text-xs text-slate-400 font-mono shrink-0">
+                <span class="text-cyan-400 font-bold">Key Insight:</span> Knockout.js introduced declarative MVVM to solve the desynchronisation nightmare of manual jQuery selectors.
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE 2: CLASSIC MVC ARCHITECTURE VS ONE-WAY DATA FLOW (REACT)           -->
+        <!-- ========================================================================= -->
+        <section class="slide flex-col justify-between w-full h-full max-h-[86vh] p-4 md:p-6 overflow-hidden" data-slide="2">
+            <div class="text-center mb-3 shrink-0">
+                <h2 class="text-2xl md:text-3xl font-black text-white tracking-tight">
+                    Classic MVC vs. One-Way Data Flow
+                </h2>
+                <p class="text-xs md:text-sm text-slate-400 font-mono mt-1">
+                    Why Facebook abandoned bidirectional binding to stop the cascading Domino Effect
+                </p>
+            </div>
+
+            <!-- 50 / 50 Columns -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 min-h-0 items-stretch">
+                <!-- Left: Classic MVC Architecture -->
+                <div class="rounded-2xl border border-purple-500/30 bg-slate-950/60 p-4 flex flex-col justify-between shadow-[0_0_25px_rgba(168,85,247,0.06)] relative overflow-hidden">
+                    <div class="flex items-center justify-between border-b border-purple-900/30 pb-2 shrink-0">
+                        <div>
+                            <h3 class="text-base font-bold text-purple-300 font-mono">Classic MVC Architecture</h3>
+                            <p class="text-[10px] uppercase font-mono tracking-wider text-rose-400">Complex Binding Flow &bull; Domino Effect</p>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800">Unpredictable</span>
+                    </div>
+
+                    <!-- Complex Mesh SVG -->
+                    <div class="relative flex-1 min-h-[180px] flex items-center justify-center my-2">
+                        <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 200" preserveAspectRatio="none">
+                            <line x1="80" y1="50" x2="320" y2="50" stroke="#f43f5e" stroke-width="1.5" />
+                            <line x1="80" y1="50" x2="200" y2="100" stroke="#94a3b8" stroke-width="1" />
+                            <line x1="320" y1="50" x2="200" y2="100" stroke="#f43f5e" stroke-width="1.5" />
+                            <line x1="80" y1="150" x2="200" y2="100" stroke="#f43f5e" stroke-width="1.5" />
+                            <line x1="320" y1="150" x2="200" y2="100" stroke="#94a3b8" stroke-width="1" />
+                            <line x1="80" y1="150" x2="320" y2="150" stroke="#f43f5e" stroke-width="1.5" />
+                            <line x1="80" y1="50" x2="80" y2="150" stroke="#f43f5e" stroke-width="1.5" />
+                            <line x1="320" y1="50" x2="320" y2="150" stroke="#f43f5e" stroke-width="1.5" />
+                            <line x1="40" y1="100" x2="200" y2="100" stroke="#f43f5e" stroke-width="1" />
+                            <line x1="360" y1="100" x2="200" y2="100" stroke="#f43f5e" stroke-width="1" />
+                        </svg>
+
+                        <!-- Nodes -->
+                        <div class="absolute top-4 left-10 px-3 py-1.5 rounded-lg bg-slate-900 border border-purple-500/40 text-xs font-mono text-purple-200">Model A</div>
+                        <div class="absolute top-4 right-10 px-3 py-1.5 rounded-lg bg-slate-900 border border-purple-500/40 text-xs font-mono text-purple-200">View A</div>
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-2 rounded-xl bg-purple-950/80 border-2 border-purple-500 text-xs font-mono font-bold text-white shadow-lg">Controller</div>
+                        <div class="absolute top-1/2 left-2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-[10px] font-mono text-slate-300">Model B</div>
+                        <div class="absolute top-1/2 right-2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-[10px] font-mono text-slate-300">Controller B</div>
+                        <div class="absolute bottom-4 left-10 px-3 py-1.5 rounded-lg bg-slate-900 border border-purple-500/40 text-xs font-mono text-purple-200">Controller C</div>
+                        <div class="absolute bottom-4 right-10 px-3 py-1.5 rounded-lg bg-slate-900 border border-purple-500/40 text-xs font-mono text-purple-200">View B</div>
+
+                        <!-- Overlay Labels -->
+                        <span class="absolute top-1 text-[9px] font-mono text-rose-400 bg-slate-950 px-2 py-0.5 rounded border border-rose-900">DATA BINDING CYCLE</span>
+                        <span class="absolute bottom-1 text-[9px] font-mono text-rose-400 bg-slate-950 px-2 py-0.5 rounded border border-rose-900">COMPLEX BINDING FLOW</span>
+                    </div>
+
+                    <!-- Interactive Demonstration -->
+                    <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-800 shrink-0 font-mono text-xs">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-slate-400 text-[11px]">Cascade Simulation:</span>
+                            <button onclick="triggerDominoCascade()" class="px-2 py-1 rounded bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/40 text-[10px] transition">
+                                Trigger Domino Cascade
+                            </button>
+                        </div>
+                        <div id="domino-log" class="text-[10px] text-slate-400 font-mono space-y-1 max-h-16 overflow-y-auto">
+                            <div>&bull; Idle: Ready to simulate cascading model updates.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: React One-Way Data Flow -->
+                <div class="rounded-2xl border border-cyan-500/30 bg-slate-950/60 p-4 flex flex-col justify-between shadow-[0_0_25px_rgba(6,182,212,0.06)] relative overflow-hidden">
+                    <div class="flex items-center justify-between border-b border-cyan-900/30 pb-2 shrink-0">
+                        <div>
+                            <h3 class="text-base font-bold text-cyan-300 font-mono">One-Way Data Flow (React)</h3>
+                            <p class="text-[10px] uppercase font-mono tracking-wider text-cyan-400">Strictly Downward &bull; Explicit Events</p>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">Predictable</span>
+                    </div>
+
+                    <!-- Clean Loop Diagram -->
+                    <div class="relative flex-1 min-h-[180px] flex items-center justify-center my-2">
+                        <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 200" preserveAspectRatio="none">
+                            <line x1="200" y1="45" x2="200" y2="85" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrow)" />
+                            <line x1="200" y1="125" x2="200" y2="155" stroke="#06b6d4" stroke-width="2" />
+                            <line x1="270" y1="105" x2="310" y2="105" stroke="#06b6d4" stroke-width="2" />
+                            <line x1="330" y1="85" x2="330" y2="35" stroke="#06b6d4" stroke-width="2" stroke-dasharray="3,3" />
+                            <line x1="330" y1="35" x2="240" y2="35" stroke="#06b6d4" stroke-width="2" stroke-dasharray="3,3" />
+                        </svg>
+
+                        <!-- Nodes -->
+                        <div class="absolute top-2 px-6 py-2 rounded-xl bg-slate-900 border-2 border-cyan-500/60 text-xs font-mono font-bold text-cyan-200 shadow">
+                            State
+                        </div>
+
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-7 py-3 rounded-2xl bg-cyan-950/80 border-2 border-cyan-400 text-sm font-mono font-black text-white shadow-[0_0_25px_rgba(6,182,212,0.4)]">
+                            Virtual DOM
+                        </div>
+
+                        <div class="absolute bottom-2 px-6 py-2 rounded-xl bg-slate-900 border-2 border-cyan-500/60 text-xs font-mono font-bold text-cyan-200 shadow">
+                            UI
+                        </div>
+
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs font-mono text-slate-300">
+                            DOM
+                        </div>
+
+                        <!-- Direction Badges -->
+                        <span class="absolute top-12 left-12 text-[9px] font-mono text-cyan-400">STATE MUTATION &darr;</span>
+                        <span class="absolute bottom-12 left-12 text-[9px] font-mono text-cyan-400">DIFFING ALGORITHM &darr;</span>
+                        <span class="absolute top-2 right-12 text-[9px] font-mono text-slate-400">EXPLICIT EVENT &uarr;</span>
+                    </div>
+
+                    <!-- Interactive Demonstration -->
+                    <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-800 shrink-0 font-mono text-xs">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-slate-400 text-[11px]">Unidirectional Flow:</span>
+                            <button onclick="dispatchOneWayEvent()" class="px-2 py-1 rounded bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-300 border border-cyan-500/40 text-[10px] transition">
+                                Dispatch Explicit Event
+                            </button>
+                        </div>
+                        <div id="oneway-log" class="text-[10px] text-cyan-300/90 font-mono space-y-1 max-h-16 overflow-y-auto">
+                            <div>&bull; Event sent &rarr; State mutated &rarr; Single pass VDOM diff &rarr; DOM updated cleanly.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Key Takeaway -->
+            <div class="mt-3 p-2 rounded-xl bg-slate-900/80 border border-slate-800 text-center text-xs text-slate-400 font-mono shrink-0">
+                <span class="text-rose-400 font-bold">The Problem:</span> Two-way binding produced uncontrollable domino loops. <span class="text-cyan-400 font-bold">The Fix:</span> React made flow one-way, restoring predictability at the cost of new diffing overhead.
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE 3: VDOM OVERHEAD VS COMPILER-FIRST TIMELINE STEPPING               -->
+        <!-- ========================================================================= -->
+        <section class="slide flex-col justify-between w-full h-full max-h-[86vh] p-4 md:p-6 overflow-hidden" data-slide="3">
+            <div class="text-center mb-2 shrink-0">
+                <h2 class="text-2xl md:text-3xl font-black text-white tracking-tight">
+                    Virtual DOM Overhead vs. Compiler-First Execution
+                </h2>
+                <p class="text-xs md:text-sm text-slate-400 font-mono mt-1">
+                    Timeline breakdown of UI update lifecycle &amp; runtime latency &bull; Press <span class="px-2 py-0.5 rounded bg-slate-800 text-cyan-300 font-bold">SPACEBAR</span> to step
+                </p>
+            </div>
+
+            <div class="flex-1 flex flex-col justify-around min-h-0 space-y-3">
+                <!-- React Track -->
+                <div class="p-3 md:p-4 rounded-2xl border border-rose-500/40 bg-slate-950/80 shadow-[0_0_20px_rgba(244,63,94,0.08)]">
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <span class="text-base font-bold text-rose-300 font-mono">React (Virtual DOM Runtime)</span>
+                            <p class="text-[11px] text-slate-400">Heavy runtime overhead: re-creating VDOM trees &amp; tree diffing algorithm</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[11px] text-slate-500 block font-mono uppercase">Cumulative Latency</span>
+                            <span id="react-total-time" class="text-lg md:text-xl font-bold font-mono text-rose-400">0 ms</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-5 gap-2 font-mono">
+                        <div id="r-step-1" class="step-box p-2 md:p-3 rounded-xl border border-rose-500/80 bg-rose-950/40 transition">
+                            <span class="text-xs font-bold text-white block">1. State Change</span>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Trigger setState</span>
+                            <span class="text-[10px] text-rose-400 font-bold block mt-2">+0ms cumulative</span>
+                        </div>
+                        <div id="r-step-2" class="step-box p-2 md:p-3 rounded-xl border border-slate-800 bg-slate-900/60 opacity-40 transition">
+                            <span class="text-xs font-bold text-slate-300 block">2. Re-render</span>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Execute function</span>
+                            <span class="text-[10px] text-slate-500 font-bold block mt-2">+8ms cumulative</span>
+                        </div>
+                        <div id="r-step-3" class="step-box p-2 md:p-3 rounded-xl border border-slate-800 bg-slate-900/60 opacity-40 transition">
+                            <span class="text-xs font-bold text-slate-300 block">3. Build VDOM</span>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Allocate object tree</span>
+                            <span class="text-[10px] text-slate-500 font-bold block mt-2">+22ms cumulative</span>
+                        </div>
+                        <div id="r-step-4" class="step-box p-2 md:p-3 rounded-xl border border-slate-800 bg-slate-900/60 opacity-40 transition">
+                            <span class="text-xs font-bold text-slate-300 block">4. Diffing</span>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Compare old vs new</span>
+                            <span class="text-[10px] text-slate-500 font-bold block mt-2">+42ms cumulative</span>
+                        </div>
+                        <div id="r-step-5" class="step-box p-2 md:p-3 rounded-xl border border-slate-800 bg-slate-900/60 opacity-40 transition">
+                            <span class="text-xs font-bold text-slate-300 block">5. Patch DOM</span>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Apply DOM mutations</span>
+                            <span class="text-[10px] text-slate-500 font-bold block mt-2">+54ms cumulative</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compiler Track -->
+                <div class="p-3 md:p-4 rounded-2xl border border-emerald-500/40 bg-slate-950/80 shadow-[0_0_20px_rgba(16,185,129,0.08)]">
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <span class="text-base font-bold text-emerald-300 font-mono">Compiler-First (TSRX / OctaneJS / Svelte)</span>
+                            <p class="text-[11px] text-slate-400">Zero VDOM overhead: AOT compiler binds state changes directly to DOM nodes</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[11px] text-slate-500 block font-mono uppercase">Cumulative Latency</span>
+                            <span id="compiler-total-time" class="text-lg md:text-xl font-bold font-mono text-emerald-400">0 ms</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 font-mono">
+                        <div id="c-step-1" class="step-box p-2 md:p-3 rounded-xl border border-emerald-500/80 bg-emerald-950/40 transition">
+                            <span class="text-xs font-bold text-white block">1. State Change</span>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Signal update</span>
+                            <span class="text-[10px] text-emerald-400 font-bold block mt-2">&zap; 0ms execution</span>
+                        </div>
+                        <div id="c-step-2" class="step-box p-2 md:p-3 rounded-xl border border-slate-800 bg-slate-900/60 opacity-40 transition">
+                            <span class="text-xs font-bold text-slate-300 block">2. Direct DOM Update</span>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Compiled pinpoint mutation</span>
+                            <span class="text-[10px] text-slate-500 font-bold block mt-2">&zap; 2ms execution</span>
+                        </div>
+                        <div id="c-step-3" class="step-box p-2 md:p-3 rounded-xl border border-slate-800 bg-slate-900/60 opacity-40 transition">
+                            <span class="text-xs font-bold text-slate-300 block">DONE</span>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">UI updated instantly</span>
+                            <span class="text-[10px] text-slate-500 font-bold block mt-2">&zap; 2ms execution</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Benchmark Bar -->
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-800 font-mono text-xs shrink-0 mt-2">
+                <span class="text-emerald-400 font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-bolt"></i>
+                    27x Faster Execution &bull; Eliminates Garbage Collection &amp; Reconciliation Overhead
+                </span>
+                <div class="flex items-center space-x-2">
+                    <button onclick="resetTimeline()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] transition">Reset</button>
+                    <button onclick="stepTimeline()" class="px-3 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-[11px] transition">Next Step (Space)</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE 4: THE HIDDEN COST OF VDOM RECONCILIATION (60% / 40%)               -->
+        <!-- ========================================================================= -->
+        <section class="slide flex-col justify-between w-full h-full max-h-[86vh] p-3 md:p-5 overflow-hidden" data-slide="4">
+            <div class="mb-1 shrink-0 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl md:text-2xl font-black text-cyan-300 tracking-tight">
+                        The Hidden Cost of Virtual DOM Reconciliation
+                    </h2>
+                    <p class="text-[11px] md:text-xs text-slate-400">
+                        Abstraction Overhead at Scale: From Garbage Collection spikes to O(t) subtree stalls
+                    </p>
+                </div>
+                <div class="flex items-center space-x-1.5 font-mono text-[11px]">
+                    <span class="px-2 py-0.5 rounded bg-rose-950 border border-rose-800 text-rose-300 font-bold">GC Overhead</span>
+                    <span class="px-2 py-0.5 rounded bg-amber-950 border border-amber-800 text-amber-300 font-bold">O(t) Traversal</span>
+                </div>
+            </div>
+
+            <!-- 60% / 40% Split -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 min-h-0 items-stretch my-1">
+                <!-- 60% Left Column: Cyber VDOM Tree -->
+                <div class="lg:col-span-7 rounded-2xl border border-cyan-500/30 bg-slate-950/80 p-3 flex flex-col justify-between relative overflow-hidden">
+                    <div class="flex items-center justify-between border-b border-cyan-900/30 pb-1.5 shrink-0">
+                        <span class="text-xs font-mono font-bold text-cyan-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-network-wired"></i> Virtual DOM Memory Tree Architecture
+                        </span>
+                        <span class="text-[10px] font-mono text-slate-400">Red Sparks = Bottlenecks</span>
+                    </div>
+
+                    <!-- Diagram Visual -->
+                    <div class="relative flex-1 min-h-[220px] flex items-center justify-center">
+                        <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 500 240" preserveAspectRatio="none">
+                            <path d="M 250 35 L 140 85 M 250 35 L 360 85" stroke="#06b6d4" stroke-width="2" opacity="0.6" />
+                            <path d="M 140 105 L 80 155 M 140 105 L 200 155" stroke="#06b6d4" stroke-width="1.5" opacity="0.5" />
+                            <path d="M 360 105 L 300 155 M 360 105 L 420 155" stroke="#06b6d4" stroke-width="1.5" opacity="0.5" />
+                            <path d="M 250 105 L 250 195" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,4" class="flow-line" />
+                        </svg>
+
+                        <!-- Tree Nodes -->
+                        <div class="absolute top-2 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-lg bg-cyan-950 border border-cyan-400 text-xs font-mono text-cyan-200 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                            Root Component
+                        </div>
+
+                        <div class="absolute top-16 left-16 px-3 py-1 rounded bg-slate-900 border border-cyan-500/60 text-[11px] font-mono text-slate-200">
+                            Subtree A
+                        </div>
+                        <div class="absolute top-16 right-16 px-3 py-1 rounded bg-slate-900 border border-cyan-500/60 text-[11px] font-mono text-slate-200">
+                            Subtree B
+                        </div>
+
+                        <!-- Hotspots -->
+                        <div class="vdom-hotspot absolute top-14 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-rose-600/40 border-2 border-rose-500 flex items-center justify-center">
+                            <i class="fa-solid fa-fire text-rose-300 text-xs"></i>
+                        </div>
+                        <div class="vdom-hotspot absolute top-20 right-28 w-6 h-6 rounded-full bg-rose-600/40 border border-rose-500 flex items-center justify-center">
+                            <i class="fa-solid fa-bolt text-rose-300 text-[9px]"></i>
+                        </div>
+                        <div class="vdom-hotspot absolute bottom-16 right-16 w-6 h-6 rounded-full bg-rose-600/40 border border-rose-500 flex items-center justify-center">
+                            <i class="fa-solid fa-bolt text-rose-300 text-[9px]"></i>
+                        </div>
+
+                        <!-- Leaf Nodes -->
+                        <div class="absolute bottom-16 left-4 flex space-x-1.5">
+                            <div class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[9px] font-mono">Node</div>
+                            <div class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[9px] font-mono">Node</div>
+                        </div>
+
+                        <div class="absolute bottom-16 right-4 flex space-x-1.5">
+                            <div class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[9px] font-mono">Node</div>
+                            <div class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[9px] font-mono">Node</div>
+                        </div>
+
+                        <!-- Real DOM Target -->
+                        <div class="absolute bottom-1 left-1/2 -translate-x-1/2 px-6 py-1.5 rounded-xl bg-slate-900 border-2 border-slate-600 text-xs font-mono font-bold text-white shadow-lg">
+                            UI (Real DOM)
+                        </div>
+                    </div>
+
+                    <!-- Callout Grid -->
+                    <div class="grid grid-cols-2 gap-2 mt-1 shrink-0 font-mono text-[10px]">
+                        <div class="p-2 rounded bg-slate-900/90 border border-cyan-800/40">
+                            <strong class="text-cyan-300 block mb-0.5">Synthetic Events:</strong>
+                            <span class="text-slate-400">Wrappers created per keystroke; strains browser garbage collector.</span>
+                        </div>
+                        <div class="p-2 rounded bg-slate-900/90 border border-rose-900/40">
+                            <strong class="text-rose-400 block mb-0.5">Garbage Collection:</strong>
+                            <span class="text-slate-400">Massive object allocation causes micro-freezes during typing and scrolling.</span>
+                        </div>
+                        <div class="p-2 rounded bg-slate-900/90 border border-rose-900/40">
+                            <strong class="text-rose-400 block mb-0.5">O(t) Complexity:</strong>
+                            <span class="text-slate-400">CPU cost scales with tree size (t) instead of pinpoint changes.</span>
+                        </div>
+                        <div class="p-2 rounded bg-slate-900/90 border border-cyan-800/40">
+                            <strong class="text-cyan-300 block mb-0.5">Diffing Overhead:</strong>
+                            <span class="text-slate-400">Scanning in-memory snapshots before dispatching minimal browser updates.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 40% Right Column: Interactive Mini-Deck -->
+                <div class="lg:col-span-5 rounded-2xl border border-slate-800 bg-slate-950/80 p-3 flex flex-col justify-between">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-1.5 shrink-0">
+                        <div class="flex items-center space-x-1">
+                            <span id="demo-indicator-1" class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                            <span id="demo-indicator-2" class="w-2 h-2 rounded-full bg-slate-700"></span>
+                            <span id="demo-indicator-3" class="w-2 h-2 rounded-full bg-slate-700"></span>
+                            <span class="text-[11px] font-mono text-slate-300 ml-1 font-bold">Interactive Demos</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <button onclick="prevDemo()" class="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400 hover:text-white text-[10px]">&larr;</button>
+                            <button onclick="nextDemo()" class="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400 hover:text-white text-[10px]">&rarr;</button>
+                        </div>
+                    </div>
+
+                    <!-- Demo Panes -->
+                    <div class="flex-1 min-h-[220px] flex flex-col justify-center my-2">
+                        <!-- Sub-Demo 1: Keystroke Lag -->
+                        <div id="sub-demo-1" class="demo-pane space-y-2 font-mono text-xs">
+                            <div class="flex items-center justify-between text-[11px]">
+                                <span class="text-rose-400 font-bold">Demo 1: Keystroke Jitter</span>
+                                <span class="text-slate-500 text-[10px]">Synthetic Event Overhead</span>
+                            </div>
+                            <input type="text" id="jitter-input" placeholder="Type rapidly to simulate synthetic event pileup..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500 font-mono">
+                            <div class="grid grid-cols-2 gap-2 text-[10px]">
+                                <div class="p-2 rounded bg-slate-900 border border-slate-800">
+                                    <span class="text-slate-500 block">Synthetic Wrappers</span>
+                                    <span id="wrapper-count" class="text-rose-400 font-bold text-sm">0 objects</span>
+                                </div>
+                                <div class="p-2 rounded bg-slate-900 border border-slate-800">
+                                    <span class="text-slate-500 block">Frame Latency Spike</span>
+                                    <span id="frame-lag" class="text-amber-400 font-bold text-sm">~0.4 ms</span>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-tight">
+                                Each keystroke triggers synthetic event allocations, GC pressure, and deep tree diffing before repainting.
+                            </p>
+                        </div>
+
+                        <!-- Sub-Demo 2: GC Spike -->
+                        <div id="sub-demo-2" class="demo-pane hidden space-y-2 font-mono text-xs">
+                            <div class="flex items-center justify-between text-[11px]">
+                                <span class="text-amber-400 font-bold">Demo 2: Garbage Collection Spike</span>
+                                <span class="text-slate-500 text-[10px]">Memory Allocation Thrash</span>
+                            </div>
+                            <button onclick="simulateGCSpike()" class="w-full py-2 rounded-lg bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/40 text-amber-300 font-bold text-xs transition">
+                                Allocate 1,000 VDOM Nodes
+                            </button>
+                            <div class="grid grid-cols-2 gap-2 text-[10px]">
+                                <div class="p-2 rounded bg-slate-900 border border-slate-800">
+                                    <span class="text-slate-500 block">Heap Memory Spike</span>
+                                    <span id="gc-heap-val" class="text-amber-400 font-bold text-sm">14.2 MB</span>
+                                </div>
+                                <div class="p-2 rounded bg-slate-900 border border-slate-800">
+                                    <span class="text-slate-500 block">Browser GC Pause</span>
+                                    <span id="gc-pause-val" class="text-rose-400 font-bold text-sm">0 ms</span>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-tight">
+                                Full-tree allocations flood the JS heap, causing the browser to pause execution while the garbage collector cleans up discarded tree nodes.
+                            </p>
+                        </div>
+
+                        <!-- Sub-Demo 3: Slider Choke -->
+                        <div id="sub-demo-3" class="demo-pane hidden space-y-2 font-mono text-xs">
+                            <div class="flex items-center justify-between text-[11px]">
+                                <span class="text-cyan-400 font-bold">Demo 3: Continuous Slider &amp; O(t)</span>
+                                <span class="text-slate-500 text-[10px]">Diffing vs Compiled Mutation</span>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] text-slate-400 mb-1">
+                                    <span>Drag Slider:</span>
+                                    <span id="vdom-slider-val" class="text-cyan-300 font-bold">50</span>
+                                </div>
+                                <input id="vdom-slider-input" type="range" min="0" max="100" value="50" class="w-full accent-cyan-400 cursor-pointer">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-[10px]">
+                                <div class="p-2 rounded bg-slate-900 border border-rose-900/40">
+                                    <span class="text-slate-500 block">React VDOM Diff</span>
+                                    <span id="vdom-react-slider-time" class="text-rose-400 font-bold text-sm">~16.4 ms</span>
+                                </div>
+                                <div class="p-2 rounded bg-slate-900 border border-emerald-900/40">
+                                    <span class="text-slate-500 block">Compiled AOT</span>
+                                    <span class="text-emerald-400 font-bold text-sm">~0.1 ms</span>
+                                </div>
+                            </div>
+                            <p id="vdom-slider-diff-cost" class="text-[10px] text-slate-400">
+                                Diffing Cost: O(1,500 nodes)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Mini-Deck Footer Navigation -->
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800 text-[11px] font-mono shrink-0">
+                        <span id="demo-page-title" class="text-slate-400">Demo 1 of 3: Keystroke Lag</span>
+                        <div class="flex space-x-1">
+                            <button onclick="setDemo(0)" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px]">1</button>
+                            <button onclick="setDemo(1)" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px]">2</button>
+                            <button onclick="setDemo(2)" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px]">3</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Insight -->
+            <div class="p-2 rounded-xl bg-slate-900/80 border border-slate-800 text-center text-xs text-slate-400 font-mono shrink-0">
+                <span class="text-rose-400 font-bold">Scale Problem:</span> At scale, the abstraction designed to speed up updates became the primary CPU &amp; GC bottleneck.
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE 5: KNOCKOUT.JS & MVVM PATTERN                                       -->
+        <!-- ========================================================================= -->
+        <section class="slide flex-col justify-center w-full h-full max-h-[88vh] p-4 md:p-6 overflow-y-auto" data-slide="5">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div>
+                    <span class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">Phase 01 // 2010 Breakthrough</span>
+                    <h2 class="text-3xl font-black text-white mt-1">Knockout.js: Two-Way Data Binding &amp; MVVM</h2>
+                    <p class="text-slate-400 text-sm mt-1">Created by Steve Sanderson to solve jQuery desync bugs and introduce declarative programming</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-2">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">01</div>
+                        <h3 class="text-base font-bold text-white">Declarative vs. Imperative</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Instead of writing <em>how</em> to select elements, calculate values, and push HTML strings back, developers declared <em>what</em> should be displayed.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-2">
+                        <div class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm">02</div>
+                        <h3 class="text-base font-bold text-white">MVVM Architecture</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Clean separation between business logic (Model), presentation markup (View), and reactive observable state (ViewModel).
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs">
+                    <div class="text-cyan-400 border-b border-slate-800 pb-1 mb-2 text-[11px] font-bold">KNOCKOUT DECLARATIVE BINDING SYNTAX</div>
+                    <pre class="text-slate-300 overflow-x-auto leading-relaxed"><code>&lt;!-- Declarative View binding --&gt;
+&lt;p&gt;Count: &lt;span data-bind="text: count"&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;button data-bind="click: increment"&gt;+1&lt;/button&gt;
+
+// ViewModel logic
+function AppViewModel() {
+  this.count = ko.observable(0);
+  this.increment = () =&gt; this.count(this.count() + 1);
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE 6: ANGULAR SCALE & THE DOMINO EFFECT                                -->
+        <!-- ========================================================================= -->
+        <section class="slide flex-col justify-center w-full h-full max-h-[88vh] p-4 md:p-6 overflow-y-auto" data-slide="6">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div>
+                    <span class="text-xs font-mono font-bold text-rose-400 uppercase tracking-widest">Phase 02 // Framework Evolution</span>
+                    <h2 class="text-3xl font-black text-white mt-1">Angular: Complete Framework &amp; The Domino Collapse</h2>
+                    <p class="text-slate-400 text-sm mt-1">When end-to-end solutions hit scale limits: Digest cycles and cascading state mutations</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-2">
+                        <i class="fa-solid fa-arrows-spin text-rose-400 text-xl"></i>
+                        <h3 class="text-base font-bold text-white">The Domino Effect</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            A change in Model A updated View A, which triggered Model B, updating View B. Circular dependency chains made it almost impossible to trace where bugs originated.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-2">
+                        <i class="fa-solid fa-gauge-high text-amber-400 text-xl"></i>
+                        <h3 class="text-base font-bold text-white">Heavy Digest Cycles</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Angular performed dirty-checking across watchers on direct DOM nodes. Large enterprise apps suffered noticeable latency due to heavy browser Layout and Reflow calculations.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-rose-950/30 border border-rose-900/40 text-xs text-rose-300 font-mono">
+                    <i class="fa-solid fa-triangle-exclamation mr-1.5"></i>
+                    Direct runtime DOM manipulations remained expensive; CPU bottlenecks grew exponentially with application scale.
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE 7: REACT VDOM BREAKTHROUGH & UNIDIRECTIONAL FLOW                    -->
+        <!-- ========================================================================= -->
+        <section class="slide flex-col justify-center w-full h-full max-h-[88vh] p-4 md:p-6 overflow-y-auto" data-slide="7">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div>
+                    <span class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">Phase 03 // React Revolution</span>
+                    <h2 class="text-3xl font-black text-white mt-1">React: Unidirectional Flow &amp; In-Memory Reconciliation</h2>
+                    <p class="text-slate-400 text-sm mt-1">Replacing two-way chaos with predictable downward state flow</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-2">
+                        <h3 class="text-base font-bold text-cyan-300">One-Way Data Flow</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Data flows downward only (from State to UI). Any update requires dispatching an explicit event. This solved the domino effect and brought predictability to debugging.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-2">
+                        <h3 class="text-base font-bold text-cyan-300">In-Memory Reconciliation</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Creating lightweight abstract object trees in JS memory. The diffing algorithm compares snapshots in memory and only applies the minimal necessary diffs to the browser DOM.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-400 font-mono">
+                    <span class="text-white font-bold">Historical Context:</span> When browser JS engines were slower and browser DOM implementations were inconsistent, the Virtual DOM was a major advantage.
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE 8: HOOK TERROR & SVELTE'S AOT COMPILER REVOLUTION                   -->
+        <!-- ========================================================================= -->
+        <section class="slide flex-col justify-center w-full h-full max-h-[88vh] p-4 md:p-6 overflow-y-auto" data-slide="8">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div>
+                    <span class="text-xs font-mono font-bold text-amber-400 uppercase tracking-widest">Phase 04 // The Resistance</span>
+                    <h2 class="text-3xl font-black text-white mt-1">Hook Terror &amp; The Svelte Rebellion</h2>
+                    <p class="text-slate-400 text-sm mt-1">When memoization arrays became a nightmare and Rich Harris declared: "Virtual DOM is pure overhead"</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-2">
+                        <h3 class="text-base font-bold text-rose-300">"Hook Terror" in React</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            To suppress unnecessary re-renders, developers had to manually manage <code>useMemo</code>, <code>useCallback</code>, and strict dependency arrays. One missed dependency caused stale closures or crashes.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-2">
+                        <h3 class="text-base font-bold text-amber-300">Svelte's AOT Manifesto</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            An Ahead-of-Time compiler that knows the UI structure at build time and generates direct DOM mutation code, completely bypassing the Virtual DOM.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-900/40 text-xs text-amber-300 font-mono">
+                    <span class="font-bold">The Dilemma:</span> Svelte dropped JSX and required non-standard syntax, cutting developers off from the massive React ecosystem.
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE 9: DOMINIC GANNAWAY & TSRX BRIDGE                                   -->
+        <!-- ========================================================================= -->
+        <section class="slide flex-col justify-center w-full h-full max-h-[88vh] p-4 md:p-6 overflow-y-auto" data-slide="9">
+            <div class="max-w-4xl mx-auto space-y-5">
+                <div>
+                    <span class="text-xs font-mono font-bold text-purple-400 uppercase tracking-widest">Phase 05 // The Architect</span>
+                    <h2 class="text-3xl font-black text-white mt-1">Dominic Gannaway &amp; TSRX</h2>
+                    <p class="text-slate-400 text-sm mt-1">Former React and Svelte core team member creating a TypeScript Superset combining compiler speed with familiar JSX</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <div class="space-y-3">
+                        <div class="p-3 rounded-lg bg-slate-900 border border-slate-800">
+                            <div class="text-xs font-bold text-purple-300 font-mono">Compiler-Inferred Dependencies</div>
+                            <div class="text-xs text-slate-300 mt-1">No more dependency arrays: static analysis determines dependencies at build time.</div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-900 border border-slate-800">
+                            <div class="text-xs font-bold text-purple-300 font-mono">Freedom from Rules of Hooks</div>
+                            <div class="text-xs text-slate-300 mt-1">Call hooks inside conditions, loops, and after early returns without crashing.</div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-900 border border-slate-800">
+                            <div class="text-xs font-bold text-purple-300 font-mono">Native Directives &amp; Scoped CSS</div>
+                            <div class="text-xs text-slate-300 mt-1">Direct if/else, for loops, and built-in scoped style tags via @{} syntactic sugar.</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs">
+                        <div class="text-purple-300 border-b border-slate-800 pb-1 mb-2 text-[11px] font-bold">TSRX COMPONENT SYNTAX</div>
+                        <pre class="text-slate-300 overflow-x-auto leading-relaxed"><code>export default component UserCard({ id }) {
+  const data = useFetch(`/api/users/${id}`);
+
+  // Conditional return before hooks? Allowed!
+  if (!data) return &lt;Skeleton /&gt;;
+
+  @{
+    &lt;div class="card"&gt;
+      &lt;h3&gt;{data.name}&lt;/h3&gt;
+    &lt;/div&gt;
+    &lt;style&gt;
+      .card { padding: 1.5rem; border-radius: 8px; }
+    &lt;/style&gt;
+  }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE 10: TSRX INNOVATIONS DEEP DIVE & CODE PARADIGM SHIFT               -->
+        <!-- ========================================================================= -->
+        <section class="slide flex-col justify-between w-full h-full max-h-[88vh] p-3 md:p-5 overflow-hidden" data-slide="10">
+            <div class="mb-1 shrink-0 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl md:text-2xl font-black text-purple-300 tracking-tight flex items-center gap-2">
+                        <span>TSRX Innovations: Beyond JSX &bull; Statement-Based Rendering</span>
+                    </h2>
+                    <p class="text-[11px] md:text-xs text-slate-400">
+                        Dominic Gannaway's TypeScript Render Extension: replacing awkward expressions with native compiler directives
+                    </p>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <button id="tsrx-tab-btn-1" class="tsrx-nav-tab px-2.5 py-1 text-[11px] rounded font-mono font-bold transition bg-purple-600 text-white">
+                        1. Control Flow
+                    </button>
+                    <button id="tsrx-tab-btn-2" class="tsrx-nav-tab px-2.5 py-1 text-[11px] rounded font-mono font-bold transition bg-slate-800 text-slate-400 hover:text-slate-200">
+                        2. Breaking Hooks Rules
+                    </button>
+                    <button id="tsrx-tab-btn-3" class="tsrx-nav-tab px-2.5 py-1 text-[11px] rounded font-mono font-bold transition bg-slate-800 text-slate-400 hover:text-slate-200">
+                        3. Scoped CSS
+                    </button>
+                    <button id="tsrx-tab-btn-4" class="tsrx-nav-tab px-2.5 py-1 text-[11px] rounded font-mono font-bold transition bg-slate-800 text-slate-400 hover:text-slate-200">
+                        4. Async &amp; Error Boundaries
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Content Panes -->
+            <div class="flex-1 min-h-0 my-1 overflow-hidden flex flex-col justify-between">
+                
+                <!-- PANE 1: Control Flow (@if / @else / @for vs Ternary / .map) -->
+                <div id="tsrx-pane-1" class="tsrx-pane flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 min-h-0 items-stretch">
+                    <!-- Left: Classic React (JSX) -->
+                    <div class="rounded-xl border border-rose-500/30 p-3 bg-slate-950/70 flex flex-col justify-between overflow-hidden">
+                        <div class="flex items-center justify-between pb-1.5 border-b border-rose-900/40 shrink-0">
+                            <span class="text-xs font-bold text-rose-300 font-mono">Classic React (JSX Expressions)</span>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800">Ternary &amp; Map Tricks</span>
+                        </div>
+                        <div class="flex-1 my-1.5 overflow-auto rounded bg-slate-900/90 p-2 font-mono text-[11px] leading-relaxed text-slate-300">
+                            <pre><code class="text-slate-300"><span class="text-purple-400">function</span> <span class="text-blue-400">MyComponent</span>({ items, isLoading }) {
+  <span class="text-purple-400">return</span> (
+    &lt;<span class="text-cyan-400">div</span>&gt;
+      {isLoading ? (
+        &lt;<span class="text-cyan-400">p</span>&gt;Loading...&lt;/<span class="text-cyan-400">p</span>&gt;
+      ) : items.length === <span class="text-amber-400">0</span> ? (
+        &lt;<span class="text-cyan-400">p</span>&gt;No items to show&lt;/<span class="text-cyan-400">p</span>&gt;
+      ) : (
+        &lt;<span class="text-cyan-400">ul</span>&gt;
+          {items.<span class="text-blue-400">map</span>((item) =&gt; (
+            &lt;<span class="text-cyan-400">li</span> <span class="text-amber-300">key</span>={item.id}&gt;{item.name}&lt;/<span class="text-cyan-400">li</span>&gt;
+          ))}
+        &lt;/<span class="text-cyan-400">ul</span>&gt;
+      )}
+    &lt;/<span class="text-cyan-400">div</span>&gt;
+  );
+}</code></pre>
+                        </div>
+                        <div class="text-[10px] text-rose-400/90 font-mono shrink-0 flex items-center gap-1.5 pt-1">
+                            <i class="fa-solid fa-triangle-exclamation text-xs"></i>
+                            <span>Unreadable nested ternaries, manual return statement, mandatory key attributes.</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: TSRX Native Control Flow -->
+                    <div class="rounded-xl border border-emerald-500/40 p-3 bg-slate-950/70 flex flex-col justify-between overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.08)]">
+                        <div class="flex items-center justify-between pb-1.5 border-b border-emerald-900/40 shrink-0">
+                            <span class="text-xs font-bold text-emerald-300 font-mono">TSRX (Native Statements)</span>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">Clean Compiler Directives</span>
+                        </div>
+                        <div class="flex-1 my-1.5 overflow-auto rounded bg-slate-900/90 p-2 font-mono text-[11px] leading-relaxed text-slate-300">
+                            <pre><code class="text-slate-300"><span class="text-emerald-400 font-bold">component</span> <span class="text-blue-400">MyComponent</span>({ items, isLoading }) {
+  &lt;<span class="text-cyan-400">div</span>&gt;
+    <span class="text-purple-400 font-bold">@if</span> (isLoading) {
+      &lt;<span class="text-cyan-400">p</span>&gt;Loading...&lt;/<span class="text-cyan-400">p</span>&gt;
+    } <span class="text-purple-400 font-bold">@else if</span> (items.length === <span class="text-amber-400">0</span>) {
+      &lt;<span class="text-cyan-400">p</span>&gt;No items to show&lt;/<span class="text-cyan-400">p</span>&gt;
+    } <span class="text-purple-400 font-bold">@else</span> {
+      &lt;<span class="text-cyan-400">ul</span>&gt;
+        <span class="text-purple-400 font-bold">@for</span> (<span class="text-purple-400">let</span> item <span class="text-purple-400">of</span> items) {
+          &lt;<span class="text-cyan-400">li</span>&gt;{item.name}&lt;/<span class="text-cyan-400">li</span>&gt;
+        }
+      &lt;/<span class="text-cyan-400">ul</span>&gt;
+    }
+  &lt;/<span class="text-cyan-400">div</span>&gt;
+}</code></pre>
+                        </div>
+                        <div class="text-[10px] text-emerald-300 font-mono shrink-0 flex items-center gap-1.5 pt-1">
+                            <i class="fa-solid fa-check-circle text-xs text-emerald-400"></i>
+                            <span>Implicit root return, native statements, compiler-optimized looping without manual keys.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PANE 2: Breaking Rules of Hooks via Compiler Hoisting -->
+                <div id="tsrx-pane-2" class="tsrx-pane hidden flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 min-h-0 items-stretch">
+                    <div class="rounded-xl border border-rose-500/30 p-3 bg-slate-950/70 flex flex-col justify-between overflow-hidden">
+                        <div class="flex items-center justify-between pb-1.5 border-b border-rose-900/40 shrink-0">
+                            <span class="text-xs font-bold text-rose-300 font-mono">React: Forbidden Inside Conditions!</span>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800">Fatal Runtime Error</span>
+                        </div>
+                        <div class="flex-1 my-1.5 overflow-auto rounded bg-slate-900/90 p-2 font-mono text-[11px] leading-relaxed text-slate-300">
+                            <pre><code class="text-slate-300"><span class="text-purple-400">function</span> <span class="text-blue-400">UserProfile</span>({ userId }) {
+  <span class="text-purple-400">if</span> (userId) {
+    <span class="text-rose-500 font-bold underline">// CRASH! React Hook called conditionally:</span>
+    <span class="text-purple-400">const</span> data = <span class="text-blue-400">useFetchUser</span>(userId);
+    <span class="text-purple-400">return</span> &lt;<span class="text-cyan-400">p</span>&gt;Hello, {data.name}&lt;/<span class="text-cyan-400">p</span>&gt;;
+  }
+  <span class="text-purple-400">return</span> &lt;<span class="text-cyan-400">p</span>&gt;Please log in&lt;/<span class="text-cyan-400">p</span>&gt;;
+}
+<span class="text-rose-400 font-bold">// Error: Rendered fewer hooks than expected!</span></code></pre>
+                        </div>
+                        <div class="text-[10px] text-rose-400 font-mono shrink-0 pt-1">
+                            React requires static hook order across renders to track internal linked lists.
+                        </div>
+                    </div>
+
+                    <div class="rounded-xl border border-purple-500/40 p-3 bg-slate-950/70 flex flex-col justify-between overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.1)]">
+                        <div class="flex items-center justify-between pb-1.5 border-b border-purple-900/40 shrink-0">
+                            <span class="text-xs font-bold text-purple-300 font-mono">TSRX: Compiler Hoisting</span>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800">100% Valid Code</span>
+                        </div>
+                        <div class="flex-1 my-1.5 overflow-auto rounded bg-slate-900/90 p-2 font-mono text-[11px] leading-relaxed text-slate-300">
+                            <pre><code class="text-slate-300"><span class="text-purple-400 font-bold">component</span> <span class="text-blue-400">UserProfile</span>({ userId }) {
+  &lt;<span class="text-cyan-400">div</span>&gt;
+    <span class="text-purple-400 font-bold">@if</span> (userId) {
+      <span class="text-emerald-400">// Completely legal in TSRX!</span>
+      <span class="text-purple-400">const</span> data = <span class="text-blue-400">useFetchUser</span>(userId);
+      &lt;<span class="text-cyan-400">p</span>&gt;Hello, {data.name}&lt;/<span class="text-cyan-400">p</span>&gt;;
+    } <span class="text-purple-400 font-bold">@else</span> {
+      &lt;<span class="text-cyan-400">p</span>&gt;Please log in&lt;/<span class="text-cyan-400">p</span>&gt;;
+    }
+  &lt;/<span class="text-cyan-400">div</span>&gt;
+}</code></pre>
+                        </div>
+                        <div class="text-[10px] text-purple-300 font-mono shrink-0 pt-1">
+                            <strong class="text-white">Smart Compiler Secret:</strong> TSRX hoists hooks to component root at build time, ensuring valid invocation order.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PANE 3: Native Scoped CSS Without Extra Libraries -->
+                <div id="tsrx-pane-3" class="tsrx-pane hidden flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 min-h-0 items-stretch">
+                    <div class="rounded-xl border border-slate-800 p-3 bg-slate-950/70 flex flex-col justify-between overflow-hidden">
+                        <div class="flex items-center justify-between pb-1.5 border-b border-slate-800 shrink-0">
+                            <span class="text-xs font-bold text-slate-200 font-mono">React Styling Pain</span>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-700">External Overhead</span>
+                        </div>
+                        <div class="space-y-2 text-xs text-slate-300 my-auto">
+                            <div class="p-2.5 rounded bg-slate-900 border border-slate-800">
+                                <strong class="text-rose-400 block mb-0.5">CSS-in-JS (Styled-Components / Emotion):</strong>
+                                <span class="text-[11px] text-slate-400">Adds runtime string parsing and dynamic style tag injection overhead on every frame.</span>
+                            </div>
+                            <div class="p-2.5 rounded bg-slate-900 border border-slate-800">
+                                <strong class="text-amber-400 block mb-0.5">CSS Modules:</strong>
+                                <span class="text-[11px] text-slate-400">Requires separate <code>.module.css</code> files, cluttered imports, and manual class joining.</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-mono shrink-0 pt-1">
+                            Result: Developer friction or runtime performance penalties.
+                        </div>
+                    </div>
+
+                    <div class="rounded-xl border border-cyan-500/40 p-3 bg-slate-950/70 flex flex-col justify-between overflow-hidden shadow-[0_0_20px_rgba(6,182,212,0.08)]">
+                        <div class="flex items-center justify-between pb-1.5 border-b border-cyan-900/40 shrink-0">
+                            <span class="text-xs font-bold text-cyan-300 font-mono">TSRX Single-File Scoped CSS</span>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">Zero Runtime Cost</span>
+                        </div>
+                        <div class="flex-1 my-1.5 overflow-auto rounded bg-slate-900/90 p-2 font-mono text-[11px] leading-relaxed text-slate-300">
+                            <pre><code class="text-slate-300"><span class="text-cyan-400 font-bold">component</span> <span class="text-blue-400">StyledButton</span>({ text }) {
+  &lt;<span class="text-cyan-400">button</span> <span class="text-amber-300">class</span>=<span class="text-emerald-400">"btn"</span>&gt;
+    {text}
+  &lt;/<span class="text-cyan-400">button</span>&gt;
+
+  &lt;<span class="text-cyan-400 font-bold">style</span>&gt;
+    <span class="text-purple-300">.btn</span> {
+      <span class="text-slate-400">background-color:</span> <span class="text-blue-400">#0070f3</span>;
+      <span class="text-slate-400">color:</span> <span class="text-white">white</span>;
+      <span class="text-slate-400">padding:</span> <span class="text-amber-300">10px 20px</span>;
+      <span class="text-slate-400">border-radius:</span> <span class="text-amber-300">5px</span>;
+    }
+  &lt;/<span class="text-cyan-400 font-bold">style</span>&gt;
+}</code></pre>
+                        </div>
+                        <div class="text-[10px] text-cyan-300 font-mono shrink-0 pt-1">
+                            Compiler automatically hashes classes (e.g. <code>.btn_x82a</code>), preventing leaks with 0 extra runtime payload.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PANE 4: Async & Error Boundaries (@try, @catch, @pending) -->
+                <div id="tsrx-pane-4" class="tsrx-pane hidden flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 min-h-0 items-stretch">
+                    <div class="rounded-xl border border-slate-800 p-3 bg-slate-950/70 flex flex-col justify-between overflow-hidden">
+                        <div class="flex items-center justify-between pb-1.5 border-b border-slate-800 shrink-0">
+                            <span class="text-xs font-bold text-slate-200 font-mono">React Suspense &amp; Error Boundaries</span>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-700">Class Components</span>
+                        </div>
+                        <div class="space-y-2 text-xs text-slate-300 my-auto">
+                            <p class="text-[11px] text-slate-300 leading-relaxed">
+                                In standard React, catching runtime render errors requires writing archaic <strong>Class Components</strong> with <code>componentDidCatch</code> or importing third-party libraries.
+                            </p>
+                            <p class="text-[11px] text-slate-400 leading-relaxed">
+                                Pairing Suspense fallback with Error Boundary fallback leads to deeply nested wrapper pyramids in JSX.
+                            </p>
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-mono shrink-0 pt-1">
+                            Cumbersome boilerplate for basic asynchronous robustness.
+                        </div>
+                    </div>
+
+                    <div class="rounded-xl border border-amber-500/40 p-3 bg-slate-950/70 flex flex-col justify-between overflow-hidden shadow-[0_0_20px_rgba(245,158,11,0.08)]">
+                        <div class="flex items-center justify-between pb-1.5 border-b border-amber-900/40 shrink-0">
+                            <span class="text-xs font-bold text-amber-300 font-mono">TSRX Native Boundaries (@try / @catch / @pending)</span>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800">Language Level</span>
+                        </div>
+                        <div class="flex-1 my-1.5 overflow-auto rounded bg-slate-900/90 p-2 font-mono text-[11px] leading-relaxed text-slate-300">
+                            <pre><code class="text-slate-300"><span class="text-amber-400 font-bold">component</span> <span class="text-blue-400">Dashboard</span>() {
+  &lt;<span class="text-cyan-400">div</span>&gt;
+    <span class="text-purple-400 font-bold">@try</span> {
+      &lt;<span class="text-blue-400">SuspensefulWidget</span> /&gt;
+    } <span class="text-amber-400 font-bold">@pending</span> {
+      &lt;<span class="text-cyan-400">p</span>&gt;Loading dashboard metrics...&lt;/<span class="text-cyan-400">p</span>&gt;
+    } <span class="text-rose-400 font-bold">@catch</span> (error) {
+      &lt;<span class="text-cyan-400">p</span>&gt;Failed to load component: {error.message}&lt;/<span class="text-cyan-400">p</span>&gt;
+    }
+  &lt;/<span class="text-cyan-400">div</span>&gt;
+}</code></pre>
+                        </div>
+                        <div class="text-[10px] text-amber-300 font-mono shrink-0 pt-1">
+                            Combines Error Boundaries &amp; Suspense into intuitive, statement-driven language constructs.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bottom Matrix Summary Comparison Table -->
+            <div class="shrink-0 p-2 rounded-xl bg-slate-900/90 border border-slate-800 text-[10px] font-mono mt-1 overflow-x-auto">
+                <div class="grid grid-cols-4 gap-2 text-center text-slate-300 divide-x divide-slate-800">
+                    <div>
+                        <span class="text-slate-500 block text-[9px] uppercase">Core Paradigm</span>
+                        <strong class="text-white">Statements vs Expressions</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block text-[9px] uppercase">Conditionals &amp; Loops</span>
+                        <strong class="text-emerald-400">@if, @else, @for Directives</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block text-[9px] uppercase">Hooks Freedom</span>
+                        <strong class="text-purple-300">Hoisted &amp; Allowed Everywhere</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block text-[9px] uppercase">Compilation Targets</span>
+                        <strong class="text-cyan-400">React &bull; Octane &bull; Solid &bull; Vue</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE 11: OCTANEJS COMPLEXITY SHIFT O(t) -> O(1)                          -->
+        <!-- ========================================================================= -->
+        <section class="slide flex-col justify-center w-full h-full max-h-[88vh] p-4 md:p-6 overflow-y-auto" data-slide="11">
+            <div class="max-w-4xl mx-auto space-y-5">
+                <div>
+                    <span class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">Phase 06 // The Algorithmic Shift</span>
+                    <h2 class="text-3xl font-black text-white mt-1">OctaneJS: From O(t) Tree Traversal to O(1) Direct Mutation</h2>
+                    <p class="text-slate-400 text-sm mt-1">Eliminating the Diff entirely: Clone-based static templates and parallel data fetching</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-rose-950/20 border border-rose-900/30 text-center space-y-2">
+                        <span class="text-xs font-mono font-bold text-rose-400 uppercase tracking-widest">Classic React Diffing</span>
+                        <div class="text-5xl font-black text-rose-500 font-mono">O(t)</div>
+                        <p class="text-xs text-slate-300">
+                            CPU cost scales with the size of the subtree (t). React traverses and re-evaluates all child nodes recursively.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-emerald-950/20 border border-emerald-900/30 text-center space-y-2">
+                        <span class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-widest">OctaneJS Direct Mutation</span>
+                        <div class="text-5xl font-black text-emerald-400 font-mono">O(1)</div>
+                        <p class="text-xs text-slate-300">
+                            AOT compiler produces direct memory access paths to dynamic nodes only. Static skeletons are duplicated in one operation via <code>clone</code>.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2 font-mono text-xs">
+                    <div class="text-cyan-400 font-bold text-[11px] flex items-center gap-2">
+                        <i class="fa-solid fa-water"></i> Eliminating Asynchronous Network Waterfalls
+                    </div>
+                    <p class="text-slate-300 leading-relaxed">
+                        In React, asynchronous loading with <code>use()</code> creates serial waterfalls unless developers manually orchestrate <code>Promise.all</code> outside components. In Octane, the compiler determines variable independence at build time and executes fetch requests concurrently in the network warmup stage.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE 12: COMPLETE ARCHITECTURE COMPARISON TABLE                          -->
+        <!-- ========================================================================= -->
+        <section class="slide flex-col justify-center w-full h-full max-h-[88vh] p-4 md:p-6 overflow-y-auto" data-slide="12">
+            <div class="max-w-5xl mx-auto space-y-4">
+                <div>
+                    <span class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">Phase 07 // Architecture Matrix</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white mt-1">Comprehensive Framework Comparison</h2>
+                    <p class="text-slate-400 text-xs md:text-sm mt-0.5">As presented in the foundational document: Evolution across paradigms</p>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/80 shadow-2xl">
+                    <table class="w-full text-left font-mono text-xs text-slate-300">
+                        <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase text-[10px] tracking-wider">
+                            <tr>
+                                <th class="p-3">Feature</th>
+                                <th class="p-3">Classic React</th>
+                                <th class="p-3">React Compiler (Meta)</th>
+                                <th class="p-3 text-cyan-400 font-bold">OctaneJS + TSRX</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60">
+                            <tr class="hover:bg-slate-800/30 transition">
+                                <td class="p-3 font-bold text-white">Virtual DOM</td>
+                                <td class="p-3 text-rose-300">Active (Runtime tree diff)</td>
+                                <td class="p-3 text-amber-300">Active (Retained in memory)</td>
+                                <td class="p-3 text-emerald-400 font-bold">Completely Eliminated (Direct AOT DOM)</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/30 transition">
+                                <td class="p-3 font-bold text-white">Rules of Hooks</td>
+                                <td class="p-3 text-rose-300">Strictly enforced</td>
+                                <td class="p-3 text-amber-300">Strictly enforced</td>
+                                <td class="p-3 text-emerald-400 font-bold">Removed (Allowed in conditions &amp; loops)</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/30 transition">
+                                <td class="p-3 font-bold text-white">Event System</td>
+                                <td class="p-3 text-rose-300">Heavy SyntheticEvent wrappers</td>
+                                <td class="p-3 text-amber-300">Heavy SyntheticEvent wrappers</td>
+                                <td class="p-3 text-emerald-400 font-bold">Native direct DOM events</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/30 transition">
+                                <td class="p-3 font-bold text-white">Dependencies</td>
+                                <td class="p-3 text-rose-300">Manual &amp; error-prone arrays</td>
+                                <td class="p-3 text-cyan-300">Auto-managed memoization</td>
+                                <td class="p-3 text-emerald-400 font-bold">Statically resolved at build time</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-400 font-mono text-center">
+                    OctaneJS + TSRX delivers the familiar React mental model with true compiled O(1) performance.
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE 13: SMOOTH MIGRATION STRATEGY                                       -->
+        <!-- ========================================================================= -->
+        <section class="slide flex-col justify-center w-full h-full max-h-[88vh] p-4 md:p-6 overflow-y-auto" data-slide="13">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div>
+                    <span class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-widest">Phase 08 // Pragmatic Adoption</span>
+                    <h2 class="text-3xl font-black text-white mt-1">Incremental Migration &amp; Compatibility Wrappers</h2>
+                    <p class="text-slate-400 text-sm mt-1">Zero all-or-nothing risk: Bridge legacy React codebases and modern Octane pipelines</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span class="font-bold text-cyan-300 font-mono">OctaneCompat</span>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">In React Apps</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Embed blazing-fast Octane components inside an existing React app. Accelerates critical performance bottlenecks without rewriting the entire codebase.
+                        </p>
+                        <pre class="p-2.5 rounded bg-slate-950 font-mono text-[11px] text-slate-300 border border-slate-800"><code>&lt;OctaneCompat&gt;
+  &lt;HighPerfDataGrid rows={data} /&gt;
+&lt;/OctaneCompat&gt;</code></pre>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span class="font-bold text-purple-300 font-mono">ReactCompat</span>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-950 text-purple-400 border border-purple-800">In Octane Apps</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Retain complex third-party React libraries (charts, 3D canvases, date-pickers) inside an Octane app, maintaining full ecosystem access.
+                        </p>
+                        <pre class="p-2.5 rounded bg-slate-950 font-mono text-[11px] text-slate-300 border border-slate-800"><code>&lt;ReactCompat&gt;
+  &lt;LegacyChartModule options={opts} /&gt;
+&lt;/ReactCompat&gt;</code></pre>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-xl bg-gradient-to-r from-cyan-950/40 via-purple-950/40 to-slate-950 border border-slate-800 text-center font-mono text-xs text-slate-300">
+                    <i class="fa-solid fa-flag-checkered text-cyan-400 mr-2"></i>
+                    The future of frontend combines the developer familiarity of React, the clean syntax of TSRX, and the raw O(1) performance of OctaneJS.
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Progress & Controls -->
+    <footer class="relative z-20 px-6 py-2.5 border-t border-slate-800/80 bg-slate-950/70 backdrop-blur-md flex items-center justify-between text-xs text-slate-400 font-mono">
+        <div class="flex items-center space-x-2">
+            <span>Slide <span id="current-slide-num" class="text-white font-bold">1</span> of <span id="total-slide-num">13</span></span>
+            <span class="text-slate-600">&bull;</span>
+            <span class="hidden sm:inline text-slate-500">Use Arrow keys &larr; &rarr; or Spacebar</span>
+        </div>
+
+        <div class="flex items-center space-x-1.5" id="dots-container">
+            <!-- Rendered dynamically -->
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <button onclick="prevSlide()" title="Previous Slide (&larr;)" class="px-2.5 py-1 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-300 transition flex items-center gap-1">
+                <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                <span class="hidden sm:inline">Prev</span>
+            </button>
+            <button onclick="nextSlide()" title="Next Slide (&rarr;)" class="px-2.5 py-1 rounded-lg border border-cyan-500/40 bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 transition flex items-center gap-1 font-bold">
+                <span class="hidden sm:inline">Next</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Overview Slide Grid Modal (Press O) -->
+    <div id="overview-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex flex-col justify-center items-center p-6">
+        <div class="max-w-5xl w-full flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+            <h3 class="text-sm font-bold font-mono text-white flex items-center gap-2">
+                <i class="fa-solid fa-grid-2 text-cyan-400"></i> All Slides Overview (Press O or Esc to Close)
+            </h3>
+            <button onclick="closeOverview()" class="p-1 rounded text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        <div id="overview-grid" class="max-w-5xl w-full grid grid-cols-2 md:grid-cols-4 gap-3 max-h-[75vh] overflow-y-auto p-1">
+            <!-- Dynamically populated -->
+        </div>
+    </div>
+
+    <!-- Interactive Logic Script -->
+    <script>
+        const totalSlides = 13;
+        let currentSlide = 1;
+
+        const slideTitles = [
+            "State Management Architecture",
+            "Classic MVC vs React One-Way Flow",
+            "VDOM Overhead vs Compiler Execution",
+            "The Hidden Cost of VDOM Reconciliation",
+            "Phase 01: Knockout.js & MVVM",
+            "Phase 02: Angular & Domino Effect",
+            "Phase 03: React & Synthetic Events",
+            "Phase 04: Hook Terror & Svelte",
+            "Phase 05: Dominic Gannaway & TSRX",
+            "TSRX Innovations: Beyond JSX Directives",
+            "Phase 06: OctaneJS O(t) to O(1)",
+            "Phase 07: Architecture Comparison",
+            "Phase 08: Migration Strategies"
+        ];
+
+        // Initialize dots
+        const dotsContainer = document.getElementById('dots-container');
+        if (dotsContainer) {
+            dotsContainer.innerHTML = '';
+            for (let i = 1; i <= totalSlides; i++) {
+                const dot = document.createElement('button');
+                dot.className = `w-2 h-2 rounded-full transition-all ${i === 1 ? 'bg-cyan-400 w-5' : 'bg-slate-700 hover:bg-slate-500'}`;
+                dot.title = `Go to Slide ${i}: ${slideTitles[i - 1]}`;
+                dot.onclick = () => goToSlide(i);
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        function updateUI() {
+            document.querySelectorAll('.slide').forEach((s, idx) => {
+                if (idx + 1 === currentSlide) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                }
+            });
+
+            document.getElementById('current-slide-num').textContent = currentSlide;
+            document.getElementById('slide-title-bar').textContent = `Slide ${currentSlide} of ${totalSlides}: ${slideTitles[currentSlide - 1]}`;
+
+            // Update dots
+            if (dotsContainer) {
+                Array.from(dotsContainer.children).forEach((dot, idx) => {
+                    if (idx + 1 === currentSlide) {
+                        dot.className = 'w-5 h-2 rounded-full bg-cyan-400 transition-all';
+                    } else {
+                        dot.className = 'w-2 h-2 rounded-full bg-slate-700 hover:bg-slate-500 transition-all';
+                    }
+                });
+            }
+        }
+
+        function goToSlide(n) {
+            if (n >= 1 && n <= totalSlides) {
+                currentSlide = n;
+                updateUI();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                goToSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                goToSlide(currentSlide - 1);
+            }
+        }
+
+        // Slide 1: Interactive Drift Simulator
+        let driftCount = 0;
+        function triggerDriftBug() {
+            driftCount++;
+            const domVal = document.getElementById('val-dom');
+            const jsVal = document.getElementById('val-js');
+            const alertBox = document.getElementById('drift-alert');
+
+            if (driftCount % 2 === 1) {
+                jsVal.textContent = `$${100 + driftCount * 25}`;
+                alertBox.classList.remove('hidden');
+                alertBox.classList.add('flex');
+            } else {
+                domVal.textContent = jsVal.textContent;
+                alertBox.classList.add('hidden');
+                alertBox.classList.remove('flex');
+            }
+        }
+
+        function updateTwoWay(val) {
+            const out = document.getElementById('two-way-output');
+            if (out) out.textContent = `"${val || ''}"`;
+        }
+
+        // Slide 2: Interactive Domino & One-Way Dispatchers
+        let dominoStep = 0;
+        function triggerDominoCascade() {
+            const log = document.getElementById('domino-log');
+            if (!log) return;
+            dominoStep++;
+            const messages = [
+                "&bull; User typed in View A &rarr; Model A updated.",
+                "&bull; Model A listener triggered &rarr; Controller mutated Model B.",
+                "&bull; Model B update caused View B to re-render &rarr; Digest loop repeated.",
+                "&bull; Infinite loop warning: Unable to determine source of change!"
+            ];
+            log.innerHTML += `<div class="text-rose-400">${messages[(dominoStep - 1) % messages.length]}</div>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        let oneWayCount = 0;
+        function dispatchOneWayEvent() {
+            const log = document.getElementById('oneway-log');
+            if (!log) return;
+            oneWayCount++;
+            log.innerHTML += `<div class="text-cyan-300">&bull; Event [Click_${oneWayCount}] &rarr; State updated &rarr; VDOM diff &rarr; DOM patched cleanly.</div>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Slide 3: Interactive Timeline Stepper (Spacebar)
+        let timelineStep = 1;
+        const reactTimes = ["0 ms", "8 ms", "22 ms", "42 ms", "54 ms"];
+        const compilerTimes = ["0 ms", "2 ms", "2 ms"];
+
+        function stepTimeline() {
+            timelineStep++;
+            if (timelineStep > 5) timelineStep = 1;
+            applyTimelineState();
+        }
+
+        function resetTimeline() {
+            timelineStep = 1;
+            applyTimelineState();
+        }
+
+        function applyTimelineState() {
+            const rTimeEl = document.getElementById('react-total-time');
+            const cTimeEl = document.getElementById('compiler-total-time');
+
+            if (rTimeEl) rTimeEl.textContent = reactTimes[timelineStep - 1];
+            if (cTimeEl) {
+                const cIdx = Math.min(timelineStep - 1, 2);
+                cTimeEl.textContent = compilerTimes[cIdx];
+            }
+
+            for (let i = 1; i <= 5; i++) {
+                const box = document.getElementById(`r-step-${i}`);
+                if (!box) continue;
+                if (i <= timelineStep) {
+                    box.classList.remove('opacity-40', 'border-slate-800', 'bg-slate-900/60');
+                    box.classList.add('border-rose-500/80', 'bg-rose-950/40');
+                } else {
+                    box.classList.add('opacity-40', 'border-slate-800', 'bg-slate-900/60');
+                    box.classList.remove('border-rose-500/80', 'bg-rose-950/40');
+                }
+            }
+
+            for (let i = 1; i <= 3; i++) {
+                const box = document.getElementById(`c-step-${i}`);
+                if (!box) continue;
+                if (i <= timelineStep) {
+                    box.classList.remove('opacity-40', 'border-slate-800', 'bg-slate-900/60');
+                    box.classList.add('border-emerald-500/80', 'bg-emerald-950/40');
+                } else {
+                    box.classList.add('opacity-40', 'border-slate-800', 'bg-slate-900/60');
+                    box.classList.remove('border-emerald-500/80', 'bg-emerald-950/40');
+                }
+            }
+        }
+
+        // Slide 4: 40% Mini-Deck Switcher
+        let currentDemo = 0;
+        const demoPanes = ['sub-demo-1', 'sub-demo-2', 'sub-demo-3'];
+        const demoTitles = [
+            "Demo 1 of 3: Keystroke Lag",
+            "Demo 2 of 3: Garbage Collection Spike",
+            "Demo 3 of 3: Continuous Slider & O(t)"
+        ];
+
+        function setDemo(idx) {
+            currentDemo = idx;
+            demoPanes.forEach((id, i) => {
+                const el = document.getElementById(id);
+                const ind = document.getElementById(`demo-indicator-${i + 1}`);
+                if (el) {
+                    if (i === currentDemo) {
+                        el.classList.remove('hidden');
+                    } else {
+                        el.classList.add('hidden');
+                    }
+                }
+                if (ind) {
+                    if (i === currentDemo) {
+                        ind.className = 'w-2 h-2 rounded-full bg-cyan-400';
+                    } else {
+                        ind.className = 'w-2 h-2 rounded-full bg-slate-700';
+                    }
+                }
+            });
+            const t = document.getElementById('demo-page-title');
+            if (t) t.textContent = demoTitles[currentDemo];
+        }
+
+        function nextDemo() {
+            setDemo((currentDemo + 1) % 3);
+        }
+
+        function prevDemo() {
+            setDemo((currentDemo + 2) % 3);
+        }
+
+        // Sub-Demo 1: Keystroke Event Listener
+        const jitterInput = document.getElementById('jitter-input');
+        if (jitterInput) {
+            let keystrokes = 0;
+            jitterInput.addEventListener('input', () => {
+                keystrokes += 4;
+                const wc = document.getElementById('wrapper-count');
+                const fl = document.getElementById('frame-lag');
+                if (wc) wc.textContent = `${keystrokes} objects`;
+                if (fl) fl.textContent = `~${(0.4 + (keystrokes % 12) * 0.3).toFixed(1)} ms`;
+            });
+        }
+
+        // Sub-Demo 2: GC Spike Simulation
+        function simulateGCSpike() {
+            const heap = document.getElementById('gc-heap-val');
+            const pause = document.getElementById('gc-pause-val');
+            if (heap) heap.textContent = "26.8 MB (+88%)";
+            if (pause) pause.textContent = "32.4 ms (STW Pause)";
+
+            setTimeout(() => {
+                if (heap) heap.textContent = "15.1 MB (Cleaned)";
+                if (pause) pause.textContent = "0 ms";
+            }, 2000);
+        }
+
+        // Sub-Demo 3: Continuous Slider
+        const vdomSliderInput = document.getElementById('vdom-slider-input');
+        const vdomSliderVal = document.getElementById('vdom-slider-val');
+        const vdomSliderDiffCost = document.getElementById('vdom-slider-diff-cost');
+        const vdomReactSliderTime = document.getElementById('vdom-react-slider-time');
+
+        if (vdomSliderInput) {
+            vdomSliderInput.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (vdomSliderVal) vdomSliderVal.textContent = val;
+                const nodeCount = Math.floor(1000 + val * 15);
+                if (vdomSliderDiffCost) vdomSliderDiffCost.textContent = `Diffing Cost: O(${nodeCount} nodes)`;
+                const reactTime = (8 + (val % 10) * 1.4).toFixed(1);
+                if (vdomReactSliderTime) vdomReactSliderTime.textContent = `~${reactTime} ms`;
+            });
+        }
+
+        // Slide 10: TSRX Innovations Tab Controller
+        const tsrxTabs = [
+            document.getElementById('tsrx-tab-btn-1'),
+            document.getElementById('tsrx-tab-btn-2'),
+            document.getElementById('tsrx-tab-btn-3'),
+            document.getElementById('tsrx-tab-btn-4')
+        ];
+        const tsrxPanes = [
+            document.getElementById('tsrx-pane-1'),
+            document.getElementById('tsrx-pane-2'),
+            document.getElementById('tsrx-pane-3'),
+            document.getElementById('tsrx-pane-4')
+        ];
+
+        function setTsrxTab(index) {
+            tsrxPanes.forEach((pane, i) => {
+                if (!pane) return;
+                if (i === index) {
+                    pane.classList.remove('hidden');
+                    pane.classList.add('grid');
+                } else {
+                    pane.classList.add('hidden');
+                    pane.classList.remove('grid');
+                }
+            });
+
+            tsrxTabs.forEach((tab, i) => {
+                if (!tab) return;
+                if (i === index) {
+                    tab.className = 'tsrx-nav-tab px-2.5 py-1 text-[11px] rounded font-mono font-bold transition bg-purple-600 text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]';
+                } else {
+                    tab.className = 'tsrx-nav-tab px-2.5 py-1 text-[11px] rounded font-mono font-bold transition bg-slate-800 text-slate-400 hover:text-slate-200';
+                }
+            });
+        }
+
+        tsrxTabs.forEach((tab, idx) => {
+            if (tab) {
+                tab.addEventListener('click', () => setTsrxTab(idx));
+            }
+        });
+
+        // Overview Modal
+        function openOverview() {
+            const modal = document.getElementById('overview-modal');
+            const grid = document.getElementById('overview-grid');
+            if (!modal || !grid) return;
+
+            grid.innerHTML = '';
+            for (let i = 1; i <= totalSlides; i++) {
+                const card = document.createElement('div');
+                card.className = `p-3 rounded-xl border cursor-pointer transition flex flex-col justify-between ${
+                    i === currentSlide 
+                        ? 'border-cyan-400 bg-cyan-950/40 shadow-[0_0_15px_rgba(6,182,212,0.3)]' 
+                        : 'border-slate-800 bg-slate-900/60 hover:border-slate-700 hover:bg-slate-900'
+                }`;
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-mono font-bold text-slate-400">#${i.toString().padStart(2, '0')}</span>
+                        ${i === currentSlide ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono">ACTIVE</span>' : ''}
+                    </div>
+                    <div class="text-xs font-semibold text-slate-200 line-clamp-2">${slideTitles[i - 1] || 'Slide ' + i}</div>
+                `;
+                card.onclick = () => {
+                    goToSlide(i);
+                    closeOverview();
+                };
+                grid.appendChild(card);
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeOverview() {
+            const modal = document.getElementById('overview-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        // Toggle Fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().catch(() => {});
+                }
+            }
+        }
+
+        // Global Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            // Prevent interference when typing in input fields
+            if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                return;
+            }
+
+            if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                if (currentSlide === 3) {
+                    stepTimeline();
+                } else {
+                    nextSlide();
+                }
+            } else if (e.key === 'f' || e.key === 'F') {
+                e.preventDefault();
+                toggleFullscreen();
+            } else if (e.key === 'o' || e.key === 'O') {
+                e.preventDefault();
+                const modal = document.getElementById('overview-modal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    closeOverview();
+                } else {
+                    openOverview();
+                }
+            } else if (e.key === 'Escape') {
+                closeOverview();
+            }
+        });
+
+        // Initialize state on load
+        window.addEventListener('load', () => {
+            goToSlide(1);
+        });
+    </script>
+</body>
+</html>
