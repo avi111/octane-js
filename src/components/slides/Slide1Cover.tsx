@@ -40,7 +40,7 @@ export const Slide1Cover: React.FC<Slide1CoverProps> = ({ soundEnabled, onStart,
 
         <div className="text-xs font-mono text-slate-300 flex items-center gap-2 px-2.5 py-1 rounded bg-slate-900 border border-slate-800">
           <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>11 Streamlined Slides</span>
+          <span>13 Streamlined Slides</span>
         </div>
       </div>
 
@@ -117,12 +117,12 @@ export const Slide1Cover: React.FC<Slide1CoverProps> = ({ soundEnabled, onStart,
 
           <button
             type="button"
-            onClick={() => onJumpToSlide(5)}
+            onClick={() => onJumpToSlide(6)}
             className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-cyan-500/50 hover:bg-slate-900 transition text-left cursor-pointer group"
           >
             <div className="text-[10px] text-amber-400 font-bold uppercase mb-0.5">03. The Ceiling</div>
             <div className="text-xs text-slate-200 font-semibold truncate">54ms Diff &amp; Hook Terror</div>
-            <div className="text-[10px] text-slate-400">Slide 5</div>
+            <div className="text-[10px] text-slate-400">Slide 6</div>
           </button>
 
           <button
@@ -131,7 +131,7 @@ export const Slide1Cover: React.FC<Slide1CoverProps> = ({ soundEnabled, onStart,
             className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-cyan-500/50 hover:bg-slate-900 transition text-left cursor-pointer group"
           >
             <div className="text-[10px] text-emerald-400 font-bold uppercase mb-0.5">04. The Solution</div>
-            <div className="text-xs text-slate-200 font-semibold truncate">TSRX &amp; OctaneJS O(1)</div>
+            <div className="text-xs text-slate-200 font-semibold truncate">Svelte &amp; Pre-Compile</div>
             <div className="text-[10px] text-slate-400">Slide 8</div>
           </button>
         </div>

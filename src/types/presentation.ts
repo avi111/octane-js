@@ -59,6 +59,19 @@ export const SLIDES_DATA: SlideMeta[] = [
   },
   {
     id: 5,
+    title: "The Breakthrough: Why the Virtual DOM Won in 2013",
+    subtitle: "Four game-changing advantages that brought order to the chaotic web",
+    phase: "Pillar 01 // V-DOM Advantages",
+    tags: ["Virtual DOM", "Unidirectional Flow", "Digest Cycle", "Synthetic Events", "UI=f(State)"],
+    notes: [
+      "1. Unidirectional Flow: Better Debuggability. Eliminated Knockout & Angular two-way binding loops where change sources were lost. Top-down props make state changes 100% predictable and debuggable.",
+      "2. Avoiding Digest Cycle: Faster App. Angular 1.x re-ran dirty-checking ($digest cycles) repeatedly until values stabilized. React replaced this with a single batch render pass in memory.",
+      "3. Synthetic Events: Unifying Browser Quirks. Standardized inconsistent event APIs across Chrome, Safari, and IE. Delegated events to a single document root instead of attaching thousands of listener nodes.",
+      "4. UI = f(State): Components as Pure Functions. Developers stopped writing manual appendChild or removeChild. Pass state in, get UI description out. The Virtual DOM reconciled the differences automatically."
+    ]
+  },
+  {
+    id: 6,
     title: "The Hidden Ceiling of the Virtual DOM",
     subtitle: "Why in-memory tree reconciliation stalls at scale: 54ms latency, GC pauses & O(t) diffing",
     phase: "Pillar 02 // The Ceiling",
@@ -70,19 +83,33 @@ export const SLIDES_DATA: SlideMeta[] = [
     ]
   },
   {
-    id: 6,
-    title: "Hook Terror & The Svelte Rebellion",
-    subtitle: "When memoization arrays became a nightmare and Rich Harris declared: 'Virtual DOM is pure overhead'",
-    phase: "Pillar 03 // The Resistance",
-    tags: ["Hook Terror", "useMemo", "Svelte", "Rich Harris", "AOT Compiler"],
+    id: 7,
+    title: "Understanding React Hooks: The Promise & The 'Hook Terror'",
+    subtitle: "From functional purity to the linked-list prison of Rules of Hooks and useMemo dependency fatigue",
+    phase: "Pillar 02 // Developer Experience Breakdown",
+    tags: ["React Hooks", "Rules of Hooks", "Linked List", "useMemo", "Hook Terror"],
     notes: [
-      "Functional React components introduced Hook Terror: developers manually micro-managing useMemo and useCallback dependency arrays.",
-      "One missed dependency caused stale closures or infinite re-render loops.",
-      "Svelte proved that an Ahead-Of-Time compiler can eliminate the V-DOM entirely."
+      "The Promise: React 16.8 introduced Hooks to replace verbose classes with pure functional components.",
+      "The Flaw: React stores hooks in a sequential linked list and relies on strict call order across renders.",
+      "The Terror: No hooks in conditions or loops. Miss one useMemo dependency and get stale closures or infinite render loops."
     ]
   },
   {
-    id: 7,
+    id: 8,
+    title: "Svelte's Rebellion: 'Virtual DOM Is Bad — Pre-Compile Instead'",
+    subtitle: "Rich Harris' manifesto: Eliminating the middle manager through Ahead-of-Time compilation",
+    phase: "Pillar 03 // The Compiler Rebellion",
+    tags: ["Svelte", "Rich Harris", "Pre-Compiling", "AOT", "Direct DOM"],
+    notes: [
+      "Rich Harris: 'Virtual DOM is not fast. Virtual DOM is pure overhead. It is better to pre-compile.'",
+      "Advantage 1: Zero Virtual DOM runtime (direct surgery on DOM nodes).",
+      "Advantage 2: Automatic build-time dependency analysis ($: syntax, no dependency arrays).",
+      "Advantage 3: Microscopic bundles with instant startup.",
+      "Advantage 4: Zero Garbage Collection pauses."
+    ]
+  },
+  {
+    id: 9,
     title: "Dominic Gannaway & TSRX Innovations",
     subtitle: "Bringing compiler statements (@if, @for), hoisted hooks, and scoped CSS into TypeScript JSX",
     phase: "Pillar 03 // The Architect",
@@ -95,7 +122,7 @@ export const SLIDES_DATA: SlideMeta[] = [
     ]
   },
   {
-    id: 8,
+    id: 10,
     title: "OctaneJS: From O(t) Tree Traversal to O(1) Direct Mutation",
     subtitle: "Eliminating the diff: Template cloning, pinpoint dynamic pointers, and zero async waterfalls",
     phase: "Pillar 03 // Algorithmic Shift",
@@ -107,7 +134,7 @@ export const SLIDES_DATA: SlideMeta[] = [
     ]
   },
   {
-    id: 9,
+    id: 11,
     title: "Architecture Comparison & Incremental Adoption",
     subtitle: "Zero all-or-nothing risk: Accelerating existing React codebases with OctaneCompat",
     phase: "Pillar 04 // Practical Adoption",
@@ -119,7 +146,7 @@ export const SLIDES_DATA: SlideMeta[] = [
     ]
   },
   {
-    id: 10,
+    id: 12,
     title: "The Reactive Architecture Evolution Summary",
     subtitle: "The future combines the familiarity of React, the clean syntax of TSRX, and the O(1) speed of OctaneJS",
     phase: "Keynote Synthesis",
@@ -130,7 +157,7 @@ export const SLIDES_DATA: SlideMeta[] = [
     ]
   },
   {
-    id: 11,
+    id: 13,
     title: "The End ~ Fin ~",
     subtitle: "Classic vintage cinema title card • Presented by Avi Levkovich",
     phase: "Conclusion",

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Compass, AlertTriangle, Zap, Flag, ArrowRight, FolderOpen, CheckCircle2 } from 'lucide-react';
+import React from 'react';
+import { Compass, AlertTriangle, Zap, Flag, ArrowRight, FolderOpen } from 'lucide-react';
 import { playSound } from '../../utils/audio';
 
 interface Slide2RoadmapProps {
@@ -8,27 +8,22 @@ interface Slide2RoadmapProps {
 }
 
 export const Slide2Roadmap: React.FC<Slide2RoadmapProps> = ({ soundEnabled, onJumpToSlide }) => {
-  const [selectedDrawer, setSelectedDrawer] = useState<number>(1);
-
-  const drawers = [
+  const pillars = [
     {
       id: 1,
       drawerNum: "PILLAR 01",
       pillar: "Context",
-      title: "Where We Came From",
+      title: "Where We Came From?",
       subtitle: "jQuery Desync & The React Revolution",
       accent: "cyan",
-      borderColor: "border-cyan-500/40",
-      bgColor: "bg-cyan-950/30",
-      textColor: "text-cyan-300",
+      borderColor: "border-cyan-500/50 hover:border-cyan-400",
+      bgColor: "bg-cyan-950/40 hover:bg-cyan-950/60",
+      badgeBg: "bg-cyan-950 text-cyan-300 border-cyan-800",
+      textColor: "text-cyan-400",
+      btnBg: "bg-cyan-500 hover:bg-cyan-400 text-slate-950",
       icon: Compass,
       targetSlide: 4,
-      targetSlideText: "Jump to Slide 4 (Context)",
-      points: [
-        "Imperative DOM queries created chronic desync between UI and memory.",
-        "Two-way binding loops in Knockout & Angular caused cascading domino crashes.",
-        "React introduced one-way data flow and UI = f(State) in 2013 to restore sanity."
-      ]
+      targetSlideText: "Slide 4"
     },
     {
       id: 2,
@@ -37,17 +32,14 @@ export const Slide2Roadmap: React.FC<Slide2RoadmapProps> = ({ soundEnabled, onJu
       title: "Why the V-DOM Stalls",
       subtitle: "54ms Diffing, GC Freezes & Hook Terror",
       accent: "rose",
-      borderColor: "border-rose-500/40",
-      bgColor: "bg-rose-950/30",
-      textColor: "text-rose-300",
+      borderColor: "border-rose-500/50 hover:border-rose-400",
+      bgColor: "bg-rose-950/40 hover:bg-rose-950/60",
+      badgeBg: "bg-rose-950 text-rose-300 border-rose-800",
+      textColor: "text-rose-400",
+      btnBg: "bg-rose-500 hover:bg-rose-400 text-slate-950",
       icon: AlertTriangle,
-      targetSlide: 5,
-      targetSlideText: "Jump to Slide 5 (The Ceiling)",
-      points: [
-        "Every keystroke allocates temporary object trees and synthetic event wrappers.",
-        "Garbage Collection pauses cause frame drops while O(t) diffing scales with tree size.",
-        "'Hook Terror': Developers forced to manually audit useMemo and useCallback arrays."
-      ]
+      targetSlide: 6,
+      targetSlideText: "Slide 6"
     },
     {
       id: 3,
@@ -56,17 +48,14 @@ export const Slide2Roadmap: React.FC<Slide2RoadmapProps> = ({ soundEnabled, onJu
       title: "Direct DOM Revolution",
       subtitle: "Svelte, Dominic Gannaway's TSRX & OctaneJS O(1)",
       accent: "purple",
-      borderColor: "border-purple-500/40",
-      bgColor: "bg-purple-950/30",
-      textColor: "text-purple-300",
+      borderColor: "border-purple-500/50 hover:border-purple-400",
+      bgColor: "bg-purple-950/40 hover:bg-purple-950/60",
+      badgeBg: "bg-purple-950 text-purple-300 border-purple-800",
+      textColor: "text-purple-400",
+      btnBg: "bg-purple-500 hover:bg-purple-400 text-slate-950",
       icon: Zap,
-      targetSlide: 7,
-      targetSlideText: "Jump to Slide 7 (TSRX & Octane)",
-      points: [
-        "Svelte proved that the Virtual DOM is not an architectural necessity.",
-        "TSRX brings compiler statements (@if, @for) and hoists hooks out of rigid rules.",
-        "OctaneJS shifts algorithmic complexity from O(t) tree diffing to O(1) direct mutation."
-      ]
+      targetSlide: 8,
+      targetSlideText: "Slide 8"
     },
     {
       id: 4,
@@ -75,139 +64,84 @@ export const Slide2Roadmap: React.FC<Slide2RoadmapProps> = ({ soundEnabled, onJu
       title: "How to Apply Tomorrow",
       subtitle: "Incremental Adoption via OctaneCompat & ReactCompat",
       accent: "emerald",
-      borderColor: "border-emerald-500/40",
-      bgColor: "bg-emerald-950/30",
-      textColor: "text-emerald-300",
+      borderColor: "border-emerald-500/50 hover:border-emerald-400",
+      bgColor: "bg-emerald-950/40 hover:bg-emerald-950/60",
+      badgeBg: "bg-emerald-950 text-emerald-300 border-emerald-800",
+      textColor: "text-emerald-400",
+      btnBg: "bg-emerald-500 hover:bg-emerald-400 text-slate-950",
       icon: Flag,
-      targetSlide: 9,
-      targetSlideText: "Jump to Slide 9 (Adoption)",
-      points: [
-        "Zero greenfield rewrite risk: Isolate high-frequency bottlenecks with OctaneCompat.",
-        "Preserve existing ecosystem: Run legacy React charts & canvases inside ReactCompat.",
-        "Best of both worlds: Familiar JSX developer ergonomics with raw compiled O(1) speed."
-      ]
+      targetSlide: 11,
+      targetSlideText: "Slide 11"
     }
   ];
 
-  const current = drawers.find((d) => d.id === selectedDrawer) || drawers[0];
-
   return (
-    <div className="flex flex-col justify-between w-full h-full p-2 md:p-5 overflow-hidden text-left dir-ltr">
+    <div className="flex flex-col justify-between w-full h-full p-3 md:p-6 overflow-hidden text-left dir-ltr">
       {/* Title */}
-      <div className="text-center mb-2 shrink-0">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-mono text-cyan-300 mb-1">
+      <div className="text-center mb-2 md:mb-3 shrink-0">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-mono text-cyan-300 mb-1 shadow-sm">
           <FolderOpen className="w-3.5 h-3.5 text-cyan-400" />
           <span>The 10-Minute Roadmap // 4 Strategic Pillars</span>
         </div>
-        <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
           Four Pillars of Reactive Architecture
         </h2>
-        <p className="text-sm md:text-base text-slate-300 font-mono mt-0.5">
+        <p className="text-xs sm:text-sm md:text-base text-slate-300 font-mono mt-0.5">
           From Pre-React DOM Chaos to Direct O(1) Mutation in 10 Minutes
         </p>
       </div>
 
-      {/* 4 Large Drawers Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-2 shrink-0">
-        {drawers.map((d) => {
-          const Icon = d.icon;
-          const isSelected = selectedDrawer === d.id;
+      {/* 4 Proportionate Pillar Boxes (Clean Titles, No Bullets, No Overlap) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 flex-1 min-h-0 my-2 items-stretch">
+        {pillars.map((p) => {
+          const Icon = p.icon;
           return (
-            <button
-              key={d.id}
-              type="button"
+            <div
+              key={p.id}
               onClick={() => {
-                setSelectedDrawer(d.id);
-                playSound('switch', soundEnabled);
+                playSound('click', soundEnabled);
+                onJumpToSlide(p.targetSlide);
               }}
-              className={`p-3.5 rounded-2xl border transition-all text-left flex flex-col justify-between cursor-pointer relative overflow-hidden group ${
-                isSelected
-                  ? `${d.borderColor} ${d.bgColor} shadow-xl scale-[1.02] ring-2 ring-cyan-500/50`
-                  : 'border-slate-800/80 bg-slate-900/60 hover:bg-slate-900 hover:border-slate-700'
-              }`}
+              className={`p-4 md:p-5 lg:p-6 rounded-2xl border transition-all duration-300 flex flex-col justify-between relative shadow-xl backdrop-blur-md cursor-pointer group hover:scale-[1.01] ${p.borderColor} ${p.bgColor}`}
             >
-              <div className="flex items-center justify-between w-full mb-2">
-                <span className="text-xs font-mono uppercase tracking-wider font-bold text-slate-400">
-                  {d.drawerNum} • {d.pillar}
+              {/* Top Header: Badge + Icon */}
+              <div className="flex items-center justify-between">
+                <span className={`text-[11px] md:text-xs font-mono uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full border ${p.badgeBg}`}>
+                  {p.drawerNum} • {p.pillar}
                 </span>
-                <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-slate-900 text-white shadow' : 'bg-slate-950 text-slate-400 group-hover:text-slate-200'}`}>
-                  <Icon className="w-4 h-4" />
+                <div className="p-2 rounded-xl bg-slate-900/90 text-white border border-slate-800 shadow group-hover:scale-105 transition-transform">
+                  <Icon className={`w-4 h-4 md:w-5 md:h-5 ${p.textColor}`} />
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors leading-snug">
-                  {d.title}
+              {/* Big, Clean Title & Subtitle with plenty of vertical headroom */}
+              <div className="my-auto py-3 space-y-2">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white leading-tight group-hover:text-cyan-300 transition-colors">
+                  {p.title}
                 </h3>
-                <p className="text-xs text-slate-300 mt-1 line-clamp-2 leading-relaxed">
-                  {d.subtitle}
+                <p className="text-xs sm:text-sm md:text-base font-medium text-slate-300 leading-snug">
+                  {p.subtitle}
                 </p>
               </div>
 
-              <div className="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs font-mono">
-                <span className={isSelected ? d.textColor : 'text-slate-400'}>
-                  {isSelected ? 'Active Focus' : 'Click to inspect'}
-                </span>
-                <ArrowRight className={`w-3.5 h-3.5 transition-transform ${isSelected ? 'translate-x-1' : 'text-slate-600'}`} />
+              {/* Action Button at bottom */}
+              <div className="pt-3 border-t border-slate-800/80">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    playSound('click', soundEnabled);
+                    onJumpToSlide(p.targetSlide);
+                  }}
+                  className={`w-full py-2.5 px-3 rounded-xl font-bold font-mono text-xs md:text-sm flex items-center justify-center gap-2 transition shadow-lg cursor-pointer active:scale-95 ${p.btnBg}`}
+                >
+                  <span>Go to {p.targetSlideText}</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </button>
               </div>
-            </button>
+            </div>
           );
         })}
-      </div>
-
-      {/* Selected Drawer Spotlight Card (BIG READABLE TEXT) */}
-      <div className={`flex-1 rounded-2xl border ${current.borderColor} ${current.bgColor} p-4 md:p-6 flex flex-col justify-between min-h-0 relative overflow-hidden backdrop-blur-sm shadow-2xl`}>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-800/80 gap-3 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center font-bold text-white shadow-lg">
-              <current.icon className={`w-6 h-6 ${current.textColor}`} />
-            </div>
-            <div>
-              <span className="text-xs font-mono uppercase tracking-wider font-bold px-2.5 py-0.5 rounded bg-slate-950 text-slate-300 border border-slate-800">
-                {current.drawerNum} • {current.pillar}
-              </span>
-              <h4 className="text-lg md:text-xl font-black text-white mt-1">{current.title} &mdash; {current.subtitle}</h4>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              playSound('click', soundEnabled);
-              onJumpToSlide(current.targetSlide);
-            }}
-            className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs font-mono flex items-center justify-center gap-2 transition shadow-lg shadow-cyan-600/30 cursor-pointer active:scale-95 shrink-0"
-          >
-            <span>{current.targetSlideText}</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* 3 Big High-Impact Bullet Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 my-auto py-2">
-          {current.points.map((point, idx) => (
-            <div key={idx} className="p-4 rounded-xl bg-slate-950/85 border border-slate-800/90 space-y-2 flex flex-col justify-between shadow-md">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-slate-900 border border-slate-700 text-cyan-300 text-xs font-mono font-bold flex items-center justify-center shrink-0">
-                  0{idx + 1}
-                </span>
-                <span className="text-xs font-mono text-slate-400 font-bold uppercase tracking-wider">Key Takeaway</span>
-              </div>
-              <p className="text-sm md:text-base text-slate-100 leading-relaxed font-sans font-medium">
-                {point}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Takeaway footer bar */}
-        <div className="pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs font-mono text-slate-400 shrink-0">
-          <span className="flex items-center gap-2 text-emerald-400 font-bold">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-            <span>Succinct 4-Pillar Keynote Progression</span>
-          </span>
-          <span className="hidden sm:inline text-slate-400">Press Space or Next to inspect the V-DOM Middle Manager metaphor</span>
-        </div>
       </div>
     </div>
   );
